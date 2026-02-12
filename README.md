@@ -24,3 +24,6 @@ The data collected varies depending on the type of sport practiced.
 
 ## Access Control
 🛡️ Some features are only accessible to authenticated users.
+
+Here you can find all the scheme of the project
+![Scheme](ProjectScheme.svg)
