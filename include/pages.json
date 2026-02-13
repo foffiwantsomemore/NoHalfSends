@@ -3,5 +3,5 @@
     "userpages": ["home.php", "feed.php"],
     "adminpages": ["?.php"],
     "loggedInPages": ["account.php", "feed.php"],
-    "DBPages": ["feed.php"]
+    "DBPages": ["feed.php", "login.php", "account.php"]
 }
