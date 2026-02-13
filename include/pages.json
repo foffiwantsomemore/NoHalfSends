@@ -1,0 +1,7 @@
+{
+    "name": "website pages",
+    "userpages": ["home.php", "feed.php"],
+    "adminpages": ["?.php"],
+    "loggedInPages": ["account.php", "feed.php"],
+    "DBPages": ["feed.php"]
+}

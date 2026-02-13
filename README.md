@@ -28,4 +28,4 @@ The data collected varies depending on the type of sport practiced.
 ## Scheme
 Here you can find all the scheme of the project
 
-![Scheme](ProjectScheme.svg)
+![Scheme](media/ProjectScheme.svg)

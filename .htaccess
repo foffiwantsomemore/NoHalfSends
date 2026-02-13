@@ -1,0 +1,3 @@
+<If "%{REQUEST_URI} != '/projects/NoHalfSends/index.php'">
+    php_value auto_prepend_file "..\include\menuChoice.php"
+</If>
