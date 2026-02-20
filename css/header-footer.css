@@ -1,0 +1,18 @@
+/* Footer Style */
+
+footer {
+    background-color: #f8f9fa;
+    text-align: center;
+    padding: 10px 0;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    border-top: 1px solid #ddd;
+}
+footer p {
+    margin: 0;
+    color: #6c757d;
+    font-size: 14px;
+}
+
+/* Admin Header Style */
