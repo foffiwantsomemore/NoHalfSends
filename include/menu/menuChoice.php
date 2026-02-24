@@ -19,10 +19,15 @@ if (file_exists($jsonPath)) {
         require __DIR__ . '/../dbHandler.php';
     }
 
-    if (in_array($pageName, $obj->userpages)) {
-        include 'userMenu.php';
-    } elseif (in_array($pageName, $obj->adminpages)) {
-        include 'adminMenu.php';
+    // home-specific navbar (unique bar for home)
+    if (property_exists($obj, 'homeOnly') && in_array($pageName, $obj->homeOnly)) {
+        include __DIR__ . '/homeMenu.php';
+    } else {
+        if (in_array($pageName, $obj->userpages)) {
+            include __DIR__ . '/userMenu.php';
+        } elseif (in_array($pageName, $obj->adminpages)) {
+            include __DIR__ . '/adminMenu.php';
+        }
     }
 } else {
     die("Error: pages.json file not found.");

@@ -1,3 +1,5 @@
+<link rel="stylesheet" href="../../css/header-footer.css">
+
 <nav>
     <ul>
         <li><a href="/projects/NoHalfSends/userpages/newactivity.php">+</a></li>

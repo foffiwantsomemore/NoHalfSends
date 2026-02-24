@@ -1,1 +1,3 @@
-<h1>CIAO</h1>
+<div class="home-center">
+  <h1>Welcome to NHS</h1>
+</div>

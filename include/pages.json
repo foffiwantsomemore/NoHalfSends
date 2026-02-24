@@ -1,6 +1,7 @@
 {
-    "userpages": ["home.php", "feed.php", "dashboard.php", "profile.php", "newactivty.php"],
-    "adminpages": ["?.php"],
-    "loggedInPages": ["profile.php", "feed.php", "dashboard.php", "newactivty.php"],
-    "DBPages": ["feed.php", "login.php", "profile.php", "dashboard.php", "newactivty.php"]
+    "userpages": ["home.php", "feed.php", "dashboard.php", "profile.php", "newactivity.php"],
+    "adminpages": ["viewusers.php"],
+    "loggedInPages": ["profile.php", "feed.php", "dashboard.php", "newactivity.php", "viewusers.php"],
+    "DBPages": ["feed.php", "login.php", "profile.php", "dashboard.php", "newactivity.php", "viewusers.php"],
+    "homeOnly": ["home.php"]
 }

@@ -1,8 +1,89 @@
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Special+Gothic+Expanded+One&display=swap');
 
+:root{
+  --fg-color: #ffffff;
+  --nav-bg: rgba(255,255,255,0.08);
+  --aurora-intensity: 0.9; /* aumentata per rendere l'aurora visibile; riduci se troppo intensa */
+}
+
 body {
     font-family: 'DM Sans', sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #f8f9fa;
+    min-height: 100vh;
+    background: linear-gradient(180deg,#071225 0%, #021019 100%);
+    color: var(--fg-color);
+    position: relative;
+    overflow-x: hidden;
+}
+
+/* Aurora layers (pseudo-element) */
+body::before{
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -2;
+    pointer-events: none;
+    background:
+      radial-gradient(42% 32% at 10% 18%, rgba(130,90,255,0.55), transparent 22%),
+      radial-gradient(56% 44% at 82% 72%, rgba(0,245,200,0.45), transparent 20%),
+      radial-gradient(34% 28% at 50% 48%, rgba(255,95,160,0.32), transparent 18%);
+    background-size: 240% 240%;
+    filter: blur(32px) saturate(1.6) contrast(1.05) brightness(1.02);
+    transform: translateZ(0);
+    animation: aurora 16s linear infinite;
+    mix-blend-mode: screen;
+    opacity: var(--aurora-intensity);
+    will-change: background-position, transform;
+}
+
+/* layer secondario per luci più nitide e overlay */
+body::after{
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -3;
+    pointer-events: none;
+    background:
+      linear-gradient(120deg, rgba(60,140,255,0.07), rgba(0,230,160,0.05));
+    filter: blur(12px) saturate(1.2);
+    transform: translateZ(0);
+    animation: aurora-slow 30s ease-in-out infinite;
+    mix-blend-mode: overlay;
+    opacity: calc(var(--aurora-intensity) * 0.9);
+    will-change: transform, opacity;
+}
+
+.home-center{
+    min-height: calc(100vh - 60px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 3rem 1rem;
+    position: relative;
+    z-index: 1;
+}
+
+.home-center h1{
+    margin: 0;
+    color: var(--fg-color);
+    font-size: clamp(28px, 6vw, 64px);
+    letter-spacing: -0.02em;
+    text-shadow: 0 12px 40px rgba(0,0,0,0.6);
+}
+
+/* movement */
+@keyframes aurora {
+  0%   { background-position: 0% 40%, 100% 60%, 50% 50%;}
+  25%  { background-position: 30% 30%, 70% 80%, 40% 60%;}
+  50%  { background-position: 60% 50%, 20% 40%, 50% 45%;}
+  75%  { background-position: 40% 70%, 90% 20%, 60% 55%;}
+  100% { background-position: 0% 40%, 100% 60%, 50% 50%;}
+}
+
+@keyframes aurora-slow {
+  0% { transform: translateY(0) scale(1); opacity: 0.95; }
+  50% { transform: translateY(-6%) scale(1.02); opacity: 1; }
+  100% { transform: translateY(0) scale(1); opacity: 0.95; }
 }
