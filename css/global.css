@@ -73,6 +73,19 @@ body::after{
     text-shadow: 0 12px 40px rgba(0,0,0,0.6);
 }
 
+.acronym-content{
+  text-align: center;
+  max-width: 760px;
+}
+
+.acronym-content p{
+  margin: 1rem 0 0;
+  color: var(--fg-color);
+  font-size: clamp(16px, 2.2vw, 24px);
+  line-height: 1.5;
+  text-shadow: 0 8px 24px rgba(0,0,0,0.45);
+}
+
 /* movement */
 @keyframes aurora {
   0%   { background-position: 0% 40%, 100% 60%, 50% 50%;}

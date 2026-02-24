@@ -1,5 +1,5 @@
 <?php
-$jsonPath = 'E:\XAMPP\htdocs\projects\NoHalfSends\include\pages.json';
+$jsonPath = '../include/pages.json';
 
 if (file_exists($jsonPath)) {
     $json = file_get_contents($jsonPath);

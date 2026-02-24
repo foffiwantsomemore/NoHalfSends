@@ -1,60 +1,97 @@
-/* General form styling */
-form {
-    max-width: 400px;
-    margin: 50px auto;
-    padding: 20px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    background-color: #ffffff;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap');
+
+:root {
+    --fg-color: #ffffff;
+    --nav-bg: rgba(255,255,255,0.08);
 }
 
-/* Input fields */
+body {
+    font-family: 'DM Sans', sans-serif;
+    margin: 0;
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    padding: 2rem 1rem;
+    background: linear-gradient(180deg,#071225 0%, #021019 100%);
+    color: var(--fg-color);
+}
+
+form {
+    width: min(420px, calc(100% - 2rem));
+    padding: 1.75rem;
+    border-radius: 14px;
+    background: linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));
+    border: 1px solid rgba(255,255,255,0.08);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(12px) saturate(1.05);
+    -webkit-backdrop-filter: blur(12px) saturate(1.05);
+}
+
 form label {
     display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
-    color: #333;
+    margin-bottom: 0.45rem;
+    font-weight: 600;
+    color: var(--fg-color);
 }
 
 form input[type="text"],
 form input[type="email"],
 form input[type="password"] {
+    box-sizing: border-box;
     width: 100%;
-    padding: 10px;
-    margin-bottom: 15px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 14px;
+    padding: 0.7rem 0.8rem;
+    margin-bottom: 0.95rem;
+    border: 1px solid rgba(255,255,255,0.16);
+    border-radius: 10px;
+    font-size: 0.95rem;
+    color: var(--fg-color);
+    background: rgba(255,255,255,0.06);
+    outline: none;
+    transition: border-color 150ms ease, box-shadow 150ms ease, background 150ms ease;
 }
 
-/* Submit button */
+form input[type="text"]:focus,
+form input[type="email"]:focus,
+form input[type="password"]:focus {
+    border-color: rgba(255,255,255,0.35);
+    box-shadow: 0 0 0 3px rgba(255,255,255,0.08);
+    background: rgba(255,255,255,0.1);
+}
+
 form input[type="submit"] {
     width: 100%;
-    padding: 10px;
-    background-color: #007bff;
-    color: #ffffff;
-    border: none;
-    border-radius: 4px;
-    font-size: 16px;
+    margin-top: 0.35rem;
+    padding: 0.75rem;
+    background: var(--nav-bg);
+    color: var(--fg-color);
+    border: 1px solid rgba(255,255,255,0.16);
+    border-radius: 10px;
+    font-size: 0.98rem;
+    font-weight: 600;
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    transition: background 150ms ease, transform 150ms ease;
 }
 
 form input[type="submit"]:hover {
-    background-color: #0056b3;
+    background: rgba(255,255,255,0.15);
+    transform: translateY(-1px);
 }
 
-/* Link styling */
 form a {
     display: block;
     text-align: center;
-    margin-top: 10px;
-    color: #007bff;
+    margin-top: 0.9rem;
+    color: var(--fg-color);
     text-decoration: none;
-    font-size: 14px;
+    font-size: 0.9rem;
+    opacity: 0.85;
 }
 
 form a:hover {
     text-decoration: underline;
+    opacity: 1;
+}
+
+form br {
+    display: none;
 }

@@ -3,5 +3,5 @@
     "adminpages": ["viewusers.php"],
     "loggedInPages": ["profile.php", "feed.php", "dashboard.php", "newactivity.php", "viewusers.php"],
     "DBPages": ["feed.php", "login.php", "profile.php", "dashboard.php", "newactivity.php", "viewusers.php"],
-    "homeOnly": ["home.php"]
+    "homeOnly": ["home.php", "acronym.php", "about.php", "loginForm.php", "registerForm.php"]
 }
