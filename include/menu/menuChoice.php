@@ -19,7 +19,7 @@ if (file_exists($jsonPath)) {
         require __DIR__ . '/../dbHandler.php';
     }
 
-    // home-specific navbar (unique bar for home)
+    // home-specific navbar (unique bar for home and related pages)
     if (property_exists($obj, 'homeOnly') && in_array($pageName, $obj->homeOnly)) {
         include __DIR__ . '/homeMenu.php';
     } else {
