@@ -112,6 +112,11 @@ body.home-page {
 .home-nav-links a:hover {
   background: rgba(255, 255, 255, 0.04);
   transform: translateY(-2px);
+  color: #ffffff;
+  text-shadow:
+    0 0 4px rgba(255, 255, 255, 0.7),
+    0 0 8px rgba(0, 174, 255, 0.7),
+    0 0 16px rgba(0, 174, 255, 0.7);
 }
 
 .home-center {

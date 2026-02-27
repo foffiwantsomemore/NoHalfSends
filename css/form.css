@@ -69,12 +69,21 @@ form input[type="submit"] {
     font-size: 0.98rem;
     font-weight: 600;
     cursor: pointer;
-    transition: background 150ms ease, transform 150ms ease;
+    transition:
+        background 150ms ease,
+        transform 150ms ease,
+        text-shadow 150ms ease,
+        color 150ms ease;
 }
 
 form input[type="submit"]:hover {
     background: rgba(255,255,255,0.15);
     transform: translateY(-1px);
+    color: #ffffff;
+    text-shadow:
+        0 0 4px rgba(255, 255, 255, 0.7),
+        0 0 8px rgba(0, 174, 255, 0.7),
+        0 0 16px rgba(0, 174, 255, 0.7);
 }
 
 form a {
