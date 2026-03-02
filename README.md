@@ -1,29 +1,58 @@
 # NHS
 
-###### The acronym NHS stands for No Half Sends, that means to don't do things half.
+###### The acronym NHS stands for *No Half Sends*, meaning to never do things halfway.
 
-The project involves the creation of a social network dedicated to sports, where registered users can share their activities and interact with other enthusiasts.
+The project consists of the development of a sports-oriented social network where registered users can share their activities and interact with other sports enthusiasts.
 
 ## User Profiles
 After registering or logging in, each user has a personal profile associated with one or more sports (cycling, running, skiing, etc.).
 
-Users can post sporting activities containing:
+Users can:
+- Publish sports activities
+- Follow other users
+- Join sport-specific clubs
+- Interact through likes and comments
+
+Each activty may include:
 - 📊 Data related to the activity
 - 📝 Descriptions
 - 📷 Optional photographs  
-
 The data collected varies depending on the type of sport practiced.
 
 ## Main Features
-- 👀 Viewing activities posted by users  
-- 🏃‍♂️ Filtering activities by type of sport  
-- ❤️ Ability to **like** activities  
-- 🗓️ Weekly and monthly summaries of activities within the user profile  
-- 🥗 Advice page dedicated to sports, nutrition, and related topics  
-- 📩 *(Features)* Messaging system linked to the advice page  
+- 👀 View activities posted by followed users
+- 🏃‍♂️ Filter activities by sport
+- ❤️ Like activities
+- 💬 Comment on activities
+- 🗓️ Weekly and monthly summaries inside the user profile
+- 🥗 Advice page dedicated to sport and nutrition
+- 📩 (Messaging system connected to the advice section)
+- 👥 Follow / subscription system between users
+- 🏆 Sport-specific clubs with member roles
+
+---
+
+## Clubs System
+Users can join multiple clubs, and each club belongs to a single sport.
+Features include:
+- Many-to-many relationship between users and clubs
+- Join date tracking
+- Role management inside the club (member, admin)
+- Dynamic member count (calculated via query)
+
+## Activity Specialization
+Activities inherit common attributes (date, duration, calories, etc.)  
+Each sport has specific technical data, implemented through specialization tables.
+This structure ensures normalization and avoids redundant data.
 
 ## Access Control
-🛡️ Some features are only accessible to authenticated users.
+🛡️ Some features are only accessible to authenticated users:
+- Posting activities
+- Commenting
+- Liking
+- Joining clubs
+- Following users
+
 🚫 Administrative pages are accessible exclusively to users with admin privileges.
 
 ## Framework Architecture
