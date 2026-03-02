@@ -24,6 +24,25 @@ The data collected varies depending on the type of sport practiced.
 
 ## Access Control
 🛡️ Some features are only accessible to authenticated users.
+🚫 Administrative pages are accessible exclusively to users with admin privileges.
+
+## Framework Architecture
+The project uses a lightweight custom framework based on:
+- `.htaccess` for URL rewriting and centralized routing
+- A `menuchoice` controller that dynamically loads pages
+- A JSON-based page classification system
+Each page is defined inside a JSON configuration file specifying its category and requirements, such as:
+- Login required
+- Admin access required
+- Database connection needed
+- Header and footer inclusion
+The `menuchoice` component reads the JSON configuration and automatically includes or requires the necessary files depending on the page type.
+
+This structure allows:
+- Cleaner code organization  
+- Reusable components (header, footer, authentication checks)  
+- Centralized access control  
+- Simplified scalability and maintainability  
 
 ## Scheme
 Here you can find all the scheme of the project
