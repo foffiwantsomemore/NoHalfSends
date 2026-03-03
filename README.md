@@ -26,11 +26,8 @@ The data collected varies depending on the type of sport practiced.
 - 💬 Comment on activities
 - 🗓️ Weekly and monthly summaries inside the user profile
 - 🥗 Advice page dedicated to sport and nutrition
-- 📩 (Messaging system connected to the advice section)
 - 👥 Follow / subscription system between users
 - 🏆 Sport-specific clubs with member roles
-
----
 
 ## Clubs System
 Users can join multiple clubs, and each club belongs to a single sport.
