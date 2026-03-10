@@ -12,11 +12,11 @@ if (file_exists($jsonPath)) {
     $pageName = basename($_SERVER['PHP_SELF']);
 
     if (in_array($pageName, $obj->loggedInPages)) {
-        require __DIR__ . '/../header.php';
+        require_once __DIR__ . '/../header.php';
     }
 
     if (in_array($pageName, $obj->DBPages)) {
-        require __DIR__ . '/../dbHandler.php';
+        require_once __DIR__ . '/../dbHandler.php';
     }
 
     // home-specific navbar (unique bar for home and related pages)
