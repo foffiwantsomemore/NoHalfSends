@@ -1,7 +1,7 @@
 CREATE DATABASE NHS;
 USE NHS;
 
-
+/*Modifica codifica caratteri*/
 
 /* Create Table */
 CREATE TABLE User (
