@@ -47,6 +47,10 @@ nav ul {
   list-style: none;
 }
 
+nav ul .nav-right {
+  margin-left: auto;
+}
+
 nav a {
   color: var(--fg-color);
   text-decoration: none;
@@ -98,6 +102,11 @@ body.home-page {
   padding: 0;
   min-height: 100%;
   list-style: none;
+  width: 100%;
+}
+
+.home-nav-links .nav-right {
+  margin-left: auto;
 }
 
 .home-nav-links a {
