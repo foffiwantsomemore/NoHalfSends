@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Special+Gothic+Expanded+One&display=swap');
+
 /* Footer */
 
 footer {
@@ -17,22 +19,27 @@ footer p {
 
 /* NavBar */
 
-nav {
+nav,
+.auth-action {
   position: fixed;
   top: 18px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 20;
-  background: var(--nav-bg);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.02));
   padding: 8px 14px;
   min-height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 12px;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(12px) saturate(1.05);
+  -webkit-backdrop-filter: blur(12px) saturate(1.05);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+nav {
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 20;
 }
 
 nav ul {
@@ -51,7 +58,8 @@ nav ul .nav-right {
   margin-left: auto;
 }
 
-nav a {
+nav a,
+.auth-action a {
   color: var(--fg-color);
   text-decoration: none;
   padding: 6px 10px;
@@ -63,7 +71,78 @@ nav a {
 
 nav a:hover {
   background: rgba(255, 255, 255, 0.06);
+  color: #ffffff;
+  text-shadow:
+    0 0 4px rgba(255, 255, 255, 0.7),
+    0 0 8px rgba(0, 174, 255, 0.7),
+    0 0 16px rgba(0, 174, 255, 0.7);
   transform: translateY(-2px);
+}
+
+.auth-action a:hover {
+  background: transparent;
+  transform: none;
+  filter: brightness(2) drop-shadow(0 0 12px rgba(0, 174, 255, 0.9)) drop-shadow(0 0 20px rgba(0, 174, 255, 0.5));
+}
+
+.auth-action a:hover img {
+  filter: brightness(3.5) saturate(2) hue-rotate(180deg) drop-shadow(0 0 8px rgba(0, 174, 255, 0.9));
+}
+
+.auth-action {
+  right: 20px;
+  width: 20px;
+  z-index: 60;
+}
+
+/* Auth icon button: square, same height as nav, transparent background */
+.auth-action a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border-radius: 10px;
+  background: transparent;
+}
+
+.auth-action a img {
+  filter: brightness(2.5) saturate(1.8) hue-rotate(180deg);
+  transition: filter 150ms ease;
+}
+
+/* Home page: make auth icon match home menu link style */
+html.home-page .auth-action {
+  top: 20px;
+}
+
+html.home-page .auth-action a {
+  width: auto;
+  height: auto;
+  padding: 6px 10px;
+  border-radius: 8px;
+  color: #eaf6ff;
+  background: transparent;
+}
+
+html.home-page .auth-action a img {
+  filter: brightness(2.5) saturate(1.8) hue-rotate(180deg);
+  transition: filter 150ms ease;
+}
+
+html.home-page .auth-action a:hover {
+  background: transparent;
+  transform: none;
+  color: #ffffff;
+  text-shadow:
+    0 0 4px rgba(255, 255, 255, 0.7),
+    0 0 8px rgba(0, 174, 255, 0.7),
+    0 0 16px rgba(0, 174, 255, 0.7);
+}
+
+html.home-page .auth-action a:hover img {
+  filter: brightness(3.5) saturate(2) hue-rotate(180deg) drop-shadow(0 0 8px rgba(0, 174, 255, 0.9));
 }
 
 /* Home */
@@ -72,7 +151,7 @@ nav a:hover {
   top: 20px;
   left: 50%;
   transform: translateX(-50%);
-  width: min(350px, calc(100% - 80px));
+  width: min(250px, calc(100% - 80px));
   z-index: 50;
   border-radius: 14px;
   min-height: 32px;
