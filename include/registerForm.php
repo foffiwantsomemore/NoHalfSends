@@ -25,6 +25,8 @@
         <input type="password" id="password" name="password" required><br><br>
 
         <input type="submit" value="Register">
+
+        <a href="loginForm.php">Do you already have an account? Login.</a>
     </form>
 
 </body>

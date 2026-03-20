@@ -23,6 +23,17 @@ CREATE TABLE Sport (
     description TEXT
 );
 
+ALTER TABLE Sport
+ADD COLUMN sportimage VARCHAR(255);
+
+CREATE TABLE SportSpecialization (
+    specializationid INT AUTO_INCREMENT PRIMARY KEY,
+    sportid INT NOT NULL,
+    name VARCHAR(50) NOT NULL,
+    description VARCHAR(255),
+    FOREIGN KEY (sportid) REFERENCES Sport(sportid)
+);
+
 CREATE TABLE Club (
     clubid INT AUTO_INCREMENT PRIMARY KEY,
     sportid INT,
@@ -217,3 +228,107 @@ CREATE TABLE AdviceLike (
 
 
 /* Inserting Into Table*/ 
+
+INSERT INTO Sport(name, description) VALUES
+    ('Run', 'A sport of running on roads or trails.'),
+    ('Cycling', 'A sport of riding bikes on roads or mountains.'),
+    ('Excursion', 'Walking or hiking in nature.'),
+    ('Gym', 'Physical training in a gym.'),
+    ('Ski', 'A snow sport using skis.'),
+    ('Swimming', 'Swimming in pools or open water.');
+
+INSERT INTO SportSpecialization(sportid, name, description) VALUES
+    ((SELECT sportid FROM Sport WHERE name = 'Ski'), 'Touring', 'Backcountry skiing on fresh snow.'),
+    ((SELECT sportid FROM Sport WHERE name = 'Ski'), 'CrossCountry', 'Cross-country skiing on groomed trails.'),
+    ((SELECT sportid FROM Sport WHERE name = 'Ski'), 'Alpine', 'Downhill skiing on slopes.');
+
+UPDATE Sport
+SET sportimage = 'images/sports/run.svg'
+WHERE name = 'Run';
+
+UPDATE Sport
+SET sportimage = 'images/sports/cycling.svg'
+WHERE name = 'Cycling';
+
+UPDATE Sport
+SET sportimage = 'images/sports/excursion.svg'
+WHERE name = 'Excursion';
+
+UPDATE Sport
+SET sportimage = 'images/sports/gym.svg'
+WHERE name = 'Gym';
+
+UPDATE Sport
+SET sportimage = 'images/sports/ski.svg'
+WHERE name = 'Ski';
+
+UPDATE Sport
+SET sportimage = 'images/sports/swimming.svg'
+WHERE name = 'Swimming';
+
+/* View */ 
+
+use nhs;
+
+-- User basic info (per la parte alta del profilo)
+CREATE VIEW v_user_profile AS
+SELECT
+    u.userid,
+    u.name,
+    u.surname,
+    u.username,
+    u.description,
+    u.userimage,
+    u.email,
+    u.registrationdate
+FROM User u;
+
+-- Sports praticati dall'utente (per la sezione "Sports practiced")
+CREATE VIEW v_user_sports AS
+SELECT
+    su.userid,
+    s.sportid,
+    s.name AS sport_name,
+    s.sportimage
+FROM SportUser su
+JOIN Sport s ON su.sportid = s.sportid;
+
+-- Attività con nome sport (per attività recenti)
+CREATE VIEW v_user_activities AS
+SELECT
+    a.activityid,
+    a.userid,
+    a.sportid,
+    s.name AS sport_name,
+    a.name AS activity_name,
+    a.activitydate,
+    a.duration
+FROM Activity a
+JOIN Sport s ON a.sportid = s.sportid;
+
+DELIMITER $$
+
+/* Stored Procedures */ 
+
+CREATE PROCEDURE sp_update_user_profile (
+    IN p_userid INT,
+    IN p_name VARCHAR(50),
+    IN p_surname VARCHAR(50),
+    IN p_description TEXT,
+    IN p_userimage VARCHAR(255),
+    IN p_weight DECIMAL(5,2),
+    IN p_address VARCHAR(255)
+)
+BEGIN
+    UPDATE User
+    SET
+        name = p_name,
+        surname = p_surname,
+        description = p_description,
+        userimage = p_userimage,
+        weight = p_weight,
+        address = p_address
+    WHERE userid = p_userid;
+END$$
+
+DELIMITER ;
