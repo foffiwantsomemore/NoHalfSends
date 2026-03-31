@@ -1,8 +1,6 @@
 <?php
 session_start();
 
-require_once 'dbHandler.php';
-
 $name = filter_input(INPUT_POST, 'name', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
 $surname = filter_input(INPUT_POST, 'surname', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
 $emailSanitized = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);
@@ -19,7 +17,7 @@ if ($name === null || $name === '' ||
 
 $pdo = DBHandler::getPDO();
 
-//email non sia già registrata
+//email already exist
 $checkSql = "SELECT userid FROM User WHERE email = :email";
 $checkStmt = $pdo->prepare($checkSql);
 $checkStmt->bindParam(':email', $email, PDO::PARAM_STR);

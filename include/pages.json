@@ -1,7 +1,7 @@
 {
-    "userpages": ["home.php", "feed.php", "dashboard.php", "profile.php", "newactivity.php", "clubs.php", "advice.php"],
+    "userpages": ["home.php", "feed.php", "dashboard.php", "profile.php", "profileEdit.php", "manageSports.php", "newactivity.php", "clubs.php", "advice.php"],
     "adminpages": ["viewusers.php"],
-    "loggedInPages": ["profile.php", "feed.php", "dashboard.php", "newactivity.php", "viewusers.php"],
-    "DBPages": ["feed.php", "login.php", "profile.php", "dashboard.php", "newactivity.php", "viewusers.php", "register.php"],
+    "loggedInPages": ["profile.php", "profileEdit.php", "manageSports.php", "feed.php", "dashboard.php", "newactivity.php", "viewusers.php", "uploadProfileImage.php"],
+    "DBPages": ["feed.php", "login.php", "profile.php", "profileEdit.php", "manageSports.php", "dashboard.php", "newactivity.php", "viewusers.php", "register.php", "uploadProfileImage.php"],
     "homeOnly": ["home.php", "acronym.php", "about.php", "loginForm.php", "registerForm.php"]
 }

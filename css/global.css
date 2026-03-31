@@ -3,7 +3,7 @@
 :root{
   --fg-color: #ffffff;
   --nav-bg: rgba(255,255,255,0.08);
-  --aurora-intensity: 0.9; /* aumentata per rendere l'aurora visibile; riduci se troppo intensa */
+  --aurora-intensity: 0.9;
 }
 
 body {
@@ -100,11 +100,6 @@ body::after{
   50% { transform: translateY(-6%) scale(1.02); opacity: 1; }
   100% { transform: translateY(0) scale(1); opacity: 0.95; }
 }
-
-
-
-
-/* ...existing code... */
 
 .profile-page {
   max-width: 1000px;
@@ -257,6 +252,184 @@ body::after{
 .recent-activities h3 {
   margin: 0 0 0.6rem;
   font-size: 1rem;
+}
+
+/* Edit profile page */
+.profile-image-block,
+.profile-edit-form {
+  margin-top: 1.2rem;
+  padding: 1rem 1.2rem;
+  border-radius: 14px;
+  background: rgba(0,0,0,0.35);
+  border: 1px solid rgba(255,255,255,0.16);
+}
+
+.profile-image-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.profile-edit-form {
+  margin-top: 1.5rem;
+}
+
+.profile-edit-form .form-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-bottom: 0.9rem;
+}
+
+.profile-edit-form label,
+.profile-image-form label {
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.profile-edit-form input[type="text"],
+.profile-edit-form input[type="email"],
+.profile-edit-form textarea {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 0.6rem 0.75rem;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.22);
+  background: rgba(255,255,255,0.09);
+  color: #fff;
+  font-size: 0.95rem;
+  outline: none;
+
+/* Manage sports page */
+.manage-sports-page .manage-sports-form {
+  margin-top: 1rem;
+  padding: 1rem 1.2rem;
+  border-radius: 14px;
+  background: rgba(0,0,0,0.35);
+  border: 1px solid rgba(255,255,255,0.16);
+}
+
+.manage-sports-hint {
+  font-size: 0.9rem;
+  opacity: 0.85;
+  margin: 0.25rem 0 0.9rem;
+}
+
+.sport-select-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 0.6rem;
+}
+
+.sport-select-item {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.45rem 0.7rem;
+  border-radius: 999px;
+  background: rgba(0,0,0,0.35);
+  border: 1px solid rgba(255,255,255,0.14);
+  font-size: 0.9rem;
+}
+
+.sport-select-item input[type="checkbox"] {
+  accent-color: #00c8ff;
+}
+
+.sport-select-item img {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+}
+
+.sport-select-name {
+  white-space: nowrap;
+}
+
+.manage-sports-actions {
+  margin-top: 1rem;
+  display: flex;
+  gap: 0.6rem;
+}
+
+.btn-secondary {
+  background: transparent;
+  border-color: rgba(255,255,255,0.22);
+}
+
+/* Generic modal */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.6);
+  z-index: 100;
+}
+
+.modal-card {
+  width: min(520px, calc(100% - 2.5rem));
+  padding: 1.2rem 1.4rem;
+  border-radius: 16px;
+  background: rgba(3,9,20,0.98);
+  border: 1px solid rgba(255,255,255,0.16);
+  box-shadow: 0 18px 60px rgba(0,0,0,0.7);
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.6rem;
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.modal-close {
+  border: none;
+  background: transparent;
+  color: #fff;
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+
+.manage-sports-card .manage-sports-form {
+  margin-top: 0.4rem;
+  padding: 0;
+  border: none;
+  background: transparent;
+}
+  resize: vertical;
+}
+
+.profile-edit-form input[type="text"]:focus,
+.profile-edit-form input[type="email"]:focus,
+.profile-edit-form textarea:focus {
+  border-color: rgba(255,255,255,0.5);
+  box-shadow: 0 0 0 3px rgba(255,255,255,0.12);
+}
+
+.error-message,
+.success-message {
+  margin: 0.8rem 0 0.4rem;
+  padding: 0.6rem 0.9rem;
+  border-radius: 10px;
+  font-size: 0.9rem;
+}
+
+.error-message {
+  background: rgba(255, 69, 58, 0.14);
+  border: 1px solid rgba(255, 69, 58, 0.6);
+}
+
+.success-message {
+  background: rgba(50, 215, 75, 0.14);
+  border: 1px solid rgba(50, 215, 75, 0.6);
 }
 .activity-item {
   padding: 0.65rem 0.4rem;

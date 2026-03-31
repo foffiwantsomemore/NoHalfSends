@@ -270,7 +270,7 @@ WHERE name = 'Swimming';
 
 use nhs;
 
--- User basic info (per la parte alta del profilo)
+--user basic info
 CREATE VIEW v_user_profile AS
 SELECT
     u.userid,
@@ -283,7 +283,7 @@ SELECT
     u.registrationdate
 FROM User u;
 
--- Sports praticati dall'utente (per la sezione "Sports practiced")
+--praticed sports
 CREATE VIEW v_user_sports AS
 SELECT
     su.userid,
@@ -293,7 +293,7 @@ SELECT
 FROM SportUser su
 JOIN Sport s ON su.sportid = s.sportid;
 
--- Attività con nome sport (per attività recenti)
+--attività recenti
 CREATE VIEW v_user_activities AS
 SELECT
     a.activityid,

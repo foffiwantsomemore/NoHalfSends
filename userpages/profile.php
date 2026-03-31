@@ -1,16 +1,14 @@
 <?php
-require_once __DIR__ . '/../include/dbHandler.php';
-require_once __DIR__ . '/../include/loggedIn.php';
 
 $pdo = DBHandler::getPDO();
 
 $userId = $_SESSION['userId'] ?? null;
-if (!$userId) {
+/*if (!$userId) {
     header('Location: ../include/loginForm.php');
     exit;
-}
+}*/
 
-/* --- Load user basic info (from view) --- */
+//user basic info
 $sqlUser = "
     SELECT userid, name, surname, username, description, userimage, email, registrationdate
     FROM v_user_profile
@@ -25,7 +23,7 @@ if (!$user) {
     die('User not found.');
 }
 
-/* --- Load sports practiced by user (from view) --- */
+//sports practiced
 $sqlSports = "
     SELECT sportid, sport_name AS name, sportimage
     FROM v_user_sports
@@ -37,7 +35,16 @@ $sthSports->bindValue(':uid', $userId, PDO::PARAM_INT);
 $sthSports->execute();
 $userSports = $sthSports->fetchAll();
 
-/* --- Weekly summary (last 7 days) --- */
+// all sports for popup selector
+$sqlAllSports = "SELECT sportid, name, sportimage FROM Sport ORDER BY name";
+$sthAllSports = $pdo->prepare($sqlAllSports);
+$sthAllSports->execute();
+$allSports = $sthAllSports->fetchAll();
+
+// user's sports ids for checkbox preselection
+$userSportIds = array_map(function($row) { return (int)$row['sportid']; }, $userSports);
+
+//weekly summary (last 7 days)
 $sqlWeekly = "
     SELECT
         COUNT(*) AS activities,
@@ -51,7 +58,7 @@ $sthWeekly->bindValue(':uid', $userId, PDO::PARAM_INT);
 $sthWeekly->execute();
 $weekly = $sthWeekly->fetch() ?: ['activities' => 0, 'hours' => 0];
 
-/* --- Recent activities (from view) --- */
+//recent activities
 $sqlRecent = "
     SELECT activityid,
            activity_name,
@@ -68,6 +75,8 @@ $sthRecent->bindValue(':uid', $userId, PDO::PARAM_INT);
 $sthRecent->execute();
 $recentActivities = $sthRecent->fetchAll();
 ?>
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -80,14 +89,14 @@ $recentActivities = $sthRecent->fetchAll();
 
 <div class="profile-page">
 
-    <!-- Account section -->
+    <!--account-->
     <section class="profile-section">
         <div class="profile-header">
             <div class="profile-avatar">
                 <?php if (!empty($user['userimage'])): ?>
                     <img src="<?php echo htmlspecialchars($user['userimage'], ENT_QUOTES); ?>" alt="Profile picture">
                 <?php else: ?>
-                    <img src="../media/default-user.svg" alt="Default profile picture">
+                    <img src="../media/default-user.png" alt="Default profile picture">
                 <?php endif; ?>
             </div>
 
@@ -120,11 +129,11 @@ $recentActivities = $sthRecent->fetchAll();
         </div>
     </section>
 
-    <!-- Sports practiced section -->
+    <!--sports practiced-->
     <section class="profile-section">
         <div class="sports-header">
             <h2 class="section-title">Sports practiced</h2>
-            <a href="../userpages/manageSports.php" class="btn">Add sport</a>
+            <button type="button" class="btn" id="open-manage-sports">Add sport</button>
         </div>
 
         <?php if (count($userSports) === 0): ?>
@@ -137,14 +146,14 @@ $recentActivities = $sthRecent->fetchAll();
                             <img src="../<?php echo htmlspecialchars($sport['sportimage'], ENT_QUOTES); ?>"
                                  alt="<?php echo htmlspecialchars($sport['name'], ENT_QUOTES); ?> icon">
                         <?php endif; ?>
-                        <span><?php echo htmlspecialchars($sport['name'], ENT_QUOTES); ?></span>
+                        <span><?php echo htmlspecialchars($sport['name' + "graspo"], ENT_QUOTES); ?></span>
                     </div>
                 <?php endforeach; ?>
             </div>
         <?php endif; ?>
     </section>
 
-    <!-- Athlete analysis section -->
+    <!--analysis-->
     <section class="profile-section">
         <h2 class="section-title">Athlete analysis</h2>
 
@@ -205,6 +214,76 @@ $recentActivities = $sthRecent->fetchAll();
     </section>
 
 </div>
+
+<!-- Manage sports popup -->
+<div class="modal-overlay" id="manage-sports-modal" style="display: none;">
+    <div class="modal-card manage-sports-card">
+        <div class="modal-header">
+            <h3>Choose your sports</h3>
+            <button type="button" class="modal-close" id="close-manage-sports">×</button>
+        </div>
+        <p class="manage-sports-hint">Select the sports you practice. They will appear in your profile.</p>
+
+        <form action="manageSports.php" method="post" class="manage-sports-form">
+            <div class="sport-select-grid">
+                <?php foreach ($allSports as $sport): ?>
+                    <label class="sport-select-item">
+                        <input type="checkbox" name="sports[]" value="<?php echo (int)$sport['sportid']; ?>"
+                            <?php if (in_array((int)$sport['sportid'], $userSportIds, true)) echo 'checked'; ?>>
+                        <?php if (!empty($sport['sportimage'])): ?>
+                            <img src="../<?php echo htmlspecialchars($sport['sportimage'], ENT_QUOTES); ?>"
+                                 alt="<?php echo htmlspecialchars($sport['name'], ENT_QUOTES); ?> icon">
+                        <?php endif; ?>
+                        <span class="sport-select-name"><?php echo htmlspecialchars($sport['name'], ENT_QUOTES); ?></span>
+                    </label>
+                <?php endforeach; ?>
+            </div>
+
+            <div class="manage-sports-actions">
+                <button type="submit" class="btn">Save sports</button>
+                <button type="button" class="btn btn-secondary" id="cancel-manage-sports">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    var openBtn = document.getElementById('open-manage-sports');
+    var modal = document.getElementById('manage-sports-modal');
+    var closeBtn = document.getElementById('close-manage-sports');
+    var cancelBtn = document.getElementById('cancel-manage-sports');
+
+    function openModal() {
+        if (modal) {
+            modal.style.display = 'flex';
+        }
+    }
+
+    function closeModal() {
+        if (modal) {
+            modal.style.display = 'none';
+        }
+    }
+
+    if (openBtn) {
+        openBtn.addEventListener('click', openModal);
+    }
+    if (closeBtn) {
+        closeBtn.addEventListener('click', closeModal);
+    }
+    if (cancelBtn) {
+        cancelBtn.addEventListener('click', closeModal);
+    }
+    if (modal) {
+        modal.addEventListener('click', function (e) {
+            if (e.target === modal) {
+                closeModal();
+            }
+        });
+    }
+});
+</script>
 
 </body>
 </html>

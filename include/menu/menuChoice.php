@@ -25,9 +25,9 @@ if (file_exists($jsonPath)) {
     } else {
         if (in_array($pageName, $obj->userpages)) {
             include __DIR__ . '/userMenu.php';
-        } elseif (in_array($pageName, $obj->adminpages)) {
+        }/* elseif (in_array($pageName, $obj->adminpages)) {
             include __DIR__ . '/adminMenu.php';
-        }
+        }*/
     }
 } else {
     die("Error: pages.json file not found.");
