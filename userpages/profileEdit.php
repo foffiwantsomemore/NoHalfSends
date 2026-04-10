@@ -82,8 +82,8 @@ if (!$user) {
             <div class="success-message"><?php echo htmlspecialchars($successMessage, ENT_QUOTES); ?></div>
         <?php endif; ?>
 
-        <div class="profile-image-block">
-            <div class="profile-header">
+        <div class="profile-edit-container">
+            <div class="profile-image-section">
                 <div class="profile-avatar">
                     <?php if (!empty($user['userimage'])): ?>
                         <img src="<?php echo htmlspecialchars($user['userimage'], ENT_QUOTES); ?>" alt="Profile picture">
@@ -98,26 +98,25 @@ if (!$user) {
                         <div class="profile-username">@<?php echo htmlspecialchars($user['username'], ENT_QUOTES); ?></div>
                     <?php endif; ?>
                 </div>
-            </div>
 
-            <div class="profile-image-actions">
-                <form action="uploadProfileImage.php" method="post" enctype="multipart/form-data" class="profile-image-form">
-                    <label for="userimage">Cambia immagine profilo:</label>
-                    <input type="file" name="userimage" id="userimage" accept="image/*" required>
-                    <button type="submit" class="btn">Carica</button>
-                </form>
-
-                <?php if (!empty($user['userimage'])): ?>
-                    <form action="uploadProfileImage.php" method="post" class="profile-image-form profile-image-remove-form">
-                        <input type="hidden" name="remove_profile" value="1">
-                        <button type="submit" class="btn">Rimuovi immagine profilo</button>
+                <div class="profile-image-actions">
+                    <form action="uploadProfileImage.php" method="post" enctype="multipart/form-data" class="profile-image-form">
+                        <label for="userimage">Cambia immagine profilo:</label>
+                        <input type="file" name="userimage" id="userimage" accept="image/*" required>
+                        <button type="submit" class="btn">Carica</button>
                     </form>
-                <?php endif; ?>
-            </div>
-        </div>
 
-        <!--dati profilo base-->
-        <form action="profileEdit.php" method="post" class="profile-edit-form">
+                    <?php if (!empty($user['userimage'])): ?>
+                        <form action="uploadProfileImage.php" method="post" class="profile-image-form profile-image-remove-form">
+                            <input type="hidden" name="remove_profile" value="1">
+                            <button type="submit" class="btn">Rimuovi immagine profilo</button>
+                        </form>
+                    <?php endif; ?>
+                </div>
+            </div>
+
+            <!--dati profilo base-->
+            <form action="profileEdit.php" method="post" class="profile-edit-form">
             <div class="form-row">
                 <label for="name">Nome</label>
                 <input type="text" id="name" name="name" value="<?php echo htmlspecialchars($user['name'] ?? '', ENT_QUOTES); ?>" required>
@@ -144,7 +143,8 @@ if (!$user) {
             </div>
 
             <button type="submit" class="btn">Salva modifiche</button>
-        </form>
+            </form>
+        </div>
 
         <p style="margin-top: 1rem;">
             <a href="profile.php" class="btn">Torna al profilo</a>

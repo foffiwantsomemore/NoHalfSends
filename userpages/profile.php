@@ -110,7 +110,7 @@ $recentActivities = $sthRecent->fetchAll();
                     <?php
                     if (!empty($user['registrationdate'])) {
                         $dt = new DateTime($user['registrationdate']);
-                        echo $dt->format('Y-m-d');
+                        echo $dt->format('d-m-Y');
                     } else {
                         echo 'N/A';
                     }
@@ -135,6 +135,38 @@ $recentActivities = $sthRecent->fetchAll();
             <h2 class="section-title">Sports practiced</h2>
             <button type="button" class="btn" id="open-manage-sports">Add sport</button>
         </div>
+        
+        <!-- Manage sports dropdown -->
+        <div id="manage-sports-dropdown" class="manage-sports-dropdown" style="display: none;">
+            <div class="manage-sports-content">
+                <div class="manage-sports-title">
+                    <h3>Choose your sports</h3>
+                    <button type="button" class="manage-sports-close" id="close-manage-sports">×</button>
+                </div>
+                <p class="manage-sports-hint">Select the sports you practice. They will appear in your profile.</p>
+
+                <form action="manageSports.php" method="post" class="manage-sports-form">
+                    <div class="sport-select-grid">
+                        <?php foreach ($allSports as $sport): ?>
+                            <label class="sport-select-item">
+                                <input type="checkbox" name="sports[]" value="<?php echo (int)$sport['sportid']; ?>"
+                                    <?php if (in_array((int)$sport['sportid'], $userSportIds, true)) echo 'checked'; ?>>
+                                <?php if (!empty($sport['sportimage'])): ?>
+                                    <img src="../<?php echo htmlspecialchars($sport['sportimage'], ENT_QUOTES); ?>"
+                                         alt="<?php echo htmlspecialchars($sport['name'], ENT_QUOTES); ?> icon">
+                                <?php endif; ?>
+                                <span class="sport-select-name"><?php echo htmlspecialchars($sport['name'], ENT_QUOTES); ?></span>
+                            </label>
+                        <?php endforeach; ?>
+                    </div>
+
+                    <div class="manage-sports-actions">
+                        <button type="submit" class="btn">Save sports</button>
+                        <button type="button" class="btn btn-secondary" id="cancel-manage-sports">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
 
         <?php if (count($userSports) === 0): ?>
             <p class="sports-empty">You have not added any sports yet.</p>
@@ -146,7 +178,7 @@ $recentActivities = $sthRecent->fetchAll();
                             <img src="../<?php echo htmlspecialchars($sport['sportimage'], ENT_QUOTES); ?>"
                                  alt="<?php echo htmlspecialchars($sport['name'], ENT_QUOTES); ?> icon">
                         <?php endif; ?>
-                        <span><?php echo htmlspecialchars($sport['name' + "graspo"], ENT_QUOTES); ?></span>
+                        <span><?php echo htmlspecialchars($sport['name'], ENT_QUOTES); ?></span>
                     </div>
                 <?php endforeach; ?>
             </div>
@@ -214,73 +246,33 @@ $recentActivities = $sthRecent->fetchAll();
     </section>
 
 </div>
-
-<!-- Manage sports popup -->
-<div class="modal-overlay" id="manage-sports-modal" style="display: none;">
-    <div class="modal-card manage-sports-card">
-        <div class="modal-header">
-            <h3>Choose your sports</h3>
-            <button type="button" class="modal-close" id="close-manage-sports">×</button>
-        </div>
-        <p class="manage-sports-hint">Select the sports you practice. They will appear in your profile.</p>
-
-        <form action="manageSports.php" method="post" class="manage-sports-form">
-            <div class="sport-select-grid">
-                <?php foreach ($allSports as $sport): ?>
-                    <label class="sport-select-item">
-                        <input type="checkbox" name="sports[]" value="<?php echo (int)$sport['sportid']; ?>"
-                            <?php if (in_array((int)$sport['sportid'], $userSportIds, true)) echo 'checked'; ?>>
-                        <?php if (!empty($sport['sportimage'])): ?>
-                            <img src="../<?php echo htmlspecialchars($sport['sportimage'], ENT_QUOTES); ?>"
-                                 alt="<?php echo htmlspecialchars($sport['name'], ENT_QUOTES); ?> icon">
-                        <?php endif; ?>
-                        <span class="sport-select-name"><?php echo htmlspecialchars($sport['name'], ENT_QUOTES); ?></span>
-                    </label>
-                <?php endforeach; ?>
-            </div>
-
-            <div class="manage-sports-actions">
-                <button type="submit" class="btn">Save sports</button>
-                <button type="button" class="btn btn-secondary" id="cancel-manage-sports">Cancel</button>
-            </div>
-        </form>
-    </div>
-</div>
-
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     var openBtn = document.getElementById('open-manage-sports');
-    var modal = document.getElementById('manage-sports-modal');
+    var dropdown = document.getElementById('manage-sports-dropdown');
     var closeBtn = document.getElementById('close-manage-sports');
     var cancelBtn = document.getElementById('cancel-manage-sports');
 
-    function openModal() {
-        if (modal) {
-            modal.style.display = 'flex';
+    function openDropdown() {
+        if (dropdown) {
+            dropdown.style.display = 'block';
         }
     }
 
-    function closeModal() {
-        if (modal) {
-            modal.style.display = 'none';
+    function closeDropdown() {
+        if (dropdown) {
+            dropdown.style.display = 'none';
         }
     }
 
     if (openBtn) {
-        openBtn.addEventListener('click', openModal);
+        openBtn.addEventListener('click', openDropdown);
     }
     if (closeBtn) {
-        closeBtn.addEventListener('click', closeModal);
+        closeBtn.addEventListener('click', closeDropdown);
     }
     if (cancelBtn) {
-        cancelBtn.addEventListener('click', closeModal);
-    }
-    if (modal) {
-        modal.addEventListener('click', function (e) {
-            if (e.target === modal) {
-                closeModal();
-            }
-        });
+        cancelBtn.addEventListener('click', closeDropdown);
     }
 });
 </script>
