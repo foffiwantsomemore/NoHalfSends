@@ -8,6 +8,8 @@ $userId = $_SESSION['userId'] ?? null;
     exit;
 }*/
 
+include __DIR__ . '/../include/menu/menuChoice.php';
+
 //user basic info
 $sqlUser = "
     SELECT userid, name, surname, username, description, userimage, email, registrationdate
@@ -22,6 +24,29 @@ $user = $sthUser->fetch();
 if (!$user) {
     die('User not found.');
 }
+
+// followers count
+$sqlFollowers = "
+    SELECT COUNT(*) AS follower_count
+    FROM Follow
+    WHERE followedid = :uid
+";
+$sthFollowers = $pdo->prepare($sqlFollowers);
+$sthFollowers->bindValue(':uid', $userId, PDO::PARAM_INT);
+$sthFollowers->execute();
+$followerCount = $sthFollowers->fetch()['follower_count'] ?? 0;
+
+// following count
+$sqlFollowing = "
+    SELECT COUNT(*) AS following_count
+    FROM Follow
+    WHERE followerid = :uid
+";
+$sthFollowing = $pdo->prepare($sqlFollowing);
+$sthFollowing->bindValue(':uid', $userId, PDO::PARAM_INT);
+$sthFollowing->execute();
+$followingCount = $sthFollowing->fetch()['following_count'] ?? 0;
+
 
 //sports practiced
 $sqlSports = "
@@ -76,7 +101,6 @@ $sthRecent->execute();
 $recentActivities = $sthRecent->fetchAll();
 ?>
 
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -125,6 +149,22 @@ $recentActivities = $sthRecent->fetchAll();
 
             <div class="profile-actions">
                 <a href="../userpages/profileEdit.php" class="btn">Edit profile</a>
+            </div>
+        </div>
+    </section>
+
+    <!--followers and following-->
+    <section class="profile-section">
+        <h2 class="section-title">Community</h2>
+
+        <div class="community-stats">
+            <div class="community-card">
+                <div class="community-value"><?php echo htmlspecialchars($followerCount, ENT_QUOTES); ?></div>
+                <div class="community-label">Followers</div>
+            </div>
+            <div class="community-card">
+                <div class="community-value"><?php echo htmlspecialchars($followingCount, ENT_QUOTES); ?></div>
+                <div class="community-label">Following</div>
             </div>
         </div>
     </section>
@@ -203,9 +243,12 @@ $recentActivities = $sthRecent->fetchAll();
                 </div>
             </div>
         </div>
+    </section>
 
+    <!--recent activities-->
+    <section class="profile-section">
+        <h2 class="section-title">Recent activities</h2>
         <div class="recent-activities">
-            <h3>Recent activities</h3>
             <?php if (count($recentActivities) === 0): ?>
                 <p class="sports-empty">No activities published yet.</p>
             <?php else: ?>

@@ -1,6 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Special+Gothic+Expanded+One&display=swap');
 
-/* Footer */
+/* ===== FOOTER ===== */
 
 footer {
   background-color: transparent;
@@ -17,7 +17,7 @@ footer p {
   font-size: 14px;
 }
 
-/* NavBar */
+/* ===== NAVIGATION BAR ===== */
 
 nav,
 .auth-action {
@@ -30,8 +30,6 @@ nav,
   align-items: center;
   justify-content: center;
   border-radius: 12px;
-  backdrop-filter: blur(12px) saturate(1.05);
-  -webkit-backdrop-filter: blur(12px) saturate(1.05);
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.45);
   border: 1px solid rgba(255, 255, 255, 0.04);
 }
@@ -67,7 +65,7 @@ nav a,
   font-weight: 600;
   font-size: 0.95rem;
   transition: background 150ms ease, transform 150ms ease, text-shadow 150ms ease;
-  text-shadow: none;
+  text-shadow: 0 0 1px transparent;
 }
 
 nav a:hover {
@@ -80,15 +78,7 @@ nav a:hover {
   transform: translateY(-2px);
 }
 
-.auth-action a:hover {
-  background: transparent;
-  transform: none;
-  filter: brightness(2) drop-shadow(0 0 12px rgba(0, 174, 255, 0.9)) drop-shadow(0 0 20px rgba(0, 174, 255, 0.5));
-}
-
-.auth-action a:hover img {
-  filter: brightness(3.5) saturate(2) hue-rotate(180deg) drop-shadow(0 0 8px rgba(0, 174, 255, 0.9));
-}
+/* ===== AUTH ACTION BUTTON ===== */
 
 .auth-action {
   right: 20px;
@@ -96,7 +86,6 @@ nav a:hover {
   z-index: 60;
 }
 
-/* Auth icon button: square, same height as nav, transparent background */
 .auth-action a {
   display: inline-flex;
   align-items: center;
@@ -113,7 +102,33 @@ nav a:hover {
   transition: filter 150ms ease;
 }
 
-/* Home page: make auth icon match home menu link style */
+.auth-action a:hover {
+  background: transparent;
+  transform: none;
+  filter: brightness(2) drop-shadow(0 0 12px rgba(0, 174, 255, 0.9)) drop-shadow(0 0 20px rgba(0, 174, 255, 0.5));
+}
+
+.auth-action a:hover img {
+  filter: brightness(3.5) saturate(2) hue-rotate(180deg) drop-shadow(0 0 8px rgba(0, 174, 255, 0.9));
+}
+
+/* ===== HOME PAGE ===== */
+
+html.home-page,
+body.home-page {
+  height: 100%;
+  overflow: hidden;
+}
+
+body:not(.home-page)::before {
+  will-change: transform;
+  pointer-events: none;
+  background: none !important;
+  filter: none !important;
+}
+
+/* Home page - Auth action variant */
+
 html.home-page .auth-action {
   top: 20px;
 }
@@ -146,7 +161,8 @@ html.home-page .auth-action a:hover img {
   filter: brightness(3.5) saturate(2) hue-rotate(180deg) drop-shadow(0 0 8px rgba(0, 174, 255, 0.9));
 }
 
-/* Home */
+/* Home Navigation */
+
 .home-nav {
   position: fixed;
   top: 20px;
@@ -167,10 +183,12 @@ html.home-page .auth-action a:hover img {
   margin: 0 auto;
 }
 
-html.home-page,
-body.home-page {
-  height: 100%;
-  overflow: hidden;
+.home-nav-inner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
 }
 
 .home-nav-links {
@@ -183,6 +201,12 @@ body.home-page {
   min-height: 100%;
   list-style: none;
   width: 100%;
+}
+
+.home-nav-links li {
+  list-style: none;
+  margin: 0;
+  padding: 0;
 }
 
 .home-nav-links .nav-right {
@@ -214,25 +238,4 @@ body.home-page {
   max-height: calc(100vh - 4.5rem);
   overflow: auto;
   -webkit-overflow-scrolling: touch;
-}
-
-body:not(.home-page)::before {
-  will-change: transform;
-  pointer-events: none;
-  background: none !important;
-  filter: none !important;
-}
-
-.home-nav-inner {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  width: 100%;
-}
-
-.home-nav-links li {
-  list-style: none;
-  margin: 0;
-  padding: 0;
 }
