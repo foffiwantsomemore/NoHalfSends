@@ -5,9 +5,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>About</title>
+    <link rel="stylesheet" href="../css/header-footer.css">
+    <link rel="stylesheet" href="../css/global.css">
+    <link rel="stylesheet" href="../css/form.css">
+
 </head>
 
 <body>
+
+    <?php include __DIR__ . '/../include/menu/homeMenu.php'; ?>
 
     <div class="home-center">
         <div class="acronym-content">
@@ -19,6 +25,9 @@
             <p>Join us and become part of a movement where half measures simply don't exist.</p>
         </div>
     </div>
+
+
+</body>
 
 </body>
 

@@ -6,10 +6,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register</title>
     <link rel="stylesheet" href="../css/form.css">
+    <link rel="stylesheet" href="../css/header-footer.css">
 
 </head>
 
 <body>
+
+    <?php include __DIR__ . '/menu/homeMenu.php'; ?>
 
     <form action="register.php" method="post">
         <label for="name">Name:</label>
@@ -28,6 +31,7 @@
 
         <a href="loginForm.php">Do you already have an account? Login.</a>
     </form>
+
 
 </body>
 

@@ -63,6 +63,7 @@ $userSportIds = array_map(function($row) { return (int)$row['sportid']; }, $user
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manage Sports - NHS</title>
     <link rel="stylesheet" href="../css/global.css">
     <link rel="stylesheet" href="../css/header-footer.css">
@@ -98,6 +99,7 @@ $userSportIds = array_map(function($row) { return (int)$row['sportid']; }, $user
         </form>
     </section>
 </div>
+
 
 </body>
 </html>

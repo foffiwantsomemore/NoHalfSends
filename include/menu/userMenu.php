@@ -9,8 +9,6 @@
     </ul>
 </nav>
 
-<div class="nav-blur-overlay"></div>
-
 <div class="auth-action">
     <a href="/projects/NoHalfSends/include/logout.php">
         <img src="/projects/NoHalfSends/media/logout.svg" alt="Logout Icon" style="width: 20px; height: 20px; vertical-align: middle;">

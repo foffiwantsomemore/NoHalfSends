@@ -1,4 +1,3 @@
 <If "%{REQUEST_URI} != '/projects/NoHalfSends/index.php'">
     php_value auto_prepend_file "/XAMPP/htdocs/projects/NoHalfSends/include/menu/menuChoice.php"
-    php_value auto_append_file "/XAMPP/htdocs/projects/NoHalfSends/include/footer.php"
 </If>

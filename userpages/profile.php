@@ -8,8 +8,6 @@ $userId = $_SESSION['userId'] ?? null;
     exit;
 }*/
 
-include __DIR__ . '/../include/menu/menuChoice.php';
-
 //user basic info
 $sqlUser = "
     SELECT userid, name, surname, username, description, userimage, email, registrationdate
@@ -105,8 +103,9 @@ $recentActivities = $sthRecent->fetchAll();
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Your Profile - NHS</title>
-    <link rel="stylesheet" href="../css/global.css">
+    <link rel="stylesheet" href="../css/global.css?v=2">
     <link rel="stylesheet" href="../css/header-footer.css">
 </head>
 <body>
@@ -319,6 +318,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 });
 </script>
+
 
 </body>
 </html>

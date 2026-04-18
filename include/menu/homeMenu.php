@@ -1,14 +1,12 @@
 <link rel="stylesheet" href="../../css/header-footer.css">
 
 <nav class="home-nav">
-  <div class="home-nav-links">
+  <ul class="home-nav-links">
     <li><a href="/projects/NoHalfSends/homepages/home.php">Home</a></li>
     <li><a href="/projects/NoHalfSends/homepages/about.php">About</a></li>
     <li><a href="/projects/NoHalfSends/homepages/acronym.php">Acronym</a></li>
-  </div>
+  </ul>
 </nav>
-
-<div class="nav-blur-overlay"></div>
 
 <div class="auth-action">
   <a href="/projects/NoHalfSends/include/loginForm.php">
