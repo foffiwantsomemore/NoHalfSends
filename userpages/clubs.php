@@ -127,53 +127,34 @@ $sports = $sportsStmt ? $sportsStmt->fetchAll() : [];
 
 $baseSql = "
     SELECT
-        c.clubid,
-        c.sportid,
-        c.name,
-        c.description,
-        c.clubimage,
-        c.creationdate,
-        s.name AS sport_name,
-        s.sportimage,
-        COALESCE(member_counts.member_count, 0) AS member_count,
-        COALESCE(activity_counts.activity_count, 0) AS activity_count,
-        activity_counts.last_activity_date,
+        cd.clubid,
+        cd.sportid,
+        cd.name,
+        cd.description,
+        cd.clubimage,
+        cd.creationdate,
+        cd.sport_name,
+        cd.sportimage,
+        cd.member_count,
+        cd.activity_count,
+        cd.last_activity_date,
         uc_user.admin AS is_admin,
         CASE WHEN uc_user.userid IS NULL THEN 0 ELSE 1 END AS is_member,
-        creator_user.username AS creator_username
-    FROM Club c
-    LEFT JOIN Sport s ON s.sportid = c.sportid
-    LEFT JOIN (
-        SELECT clubid, COUNT(*) AS member_count
-        FROM UserClub
-        GROUP BY clubid
-    ) member_counts ON member_counts.clubid = c.clubid
-    LEFT JOIN (
-        SELECT uc.clubid, COUNT(a.activityid) AS activity_count, MAX(a.activitydate) AS last_activity_date
-        FROM UserClub uc
-        LEFT JOIN Activity a ON a.userid = uc.userid
-        GROUP BY uc.clubid
-    ) activity_counts ON activity_counts.clubid = c.clubid
-    LEFT JOIN UserClub uc_user ON uc_user.clubid = c.clubid AND uc_user.userid = :uid
-    LEFT JOIN User creator_user ON creator_user.userid = (
-        SELECT uc2.userid
-        FROM UserClub uc2
-        WHERE uc2.clubid = c.clubid AND uc2.admin = 1
-        ORDER BY uc2.joindate ASC, uc2.userid ASC
-        LIMIT 1
-    )
+        cd.creator_username
+    FROM v_club_detail cd
+    LEFT JOIN UserClub uc_user ON uc_user.clubid = cd.clubid AND uc_user.userid = :uid
 ";
 
 $conditions = [];
 $params = [':uid' => $userId];
 
 if ($searchTerm !== '') {
-    $conditions[] = '(c.name LIKE :search_term OR c.description LIKE :search_term OR s.name LIKE :search_term)';
+    $conditions[] = '(cd.name LIKE :search_term OR cd.description LIKE :search_term OR cd.sport_name LIKE :search_term)';
     $params[':search_term'] = '%' . $searchTerm . '%';
 }
 
 if ($sportFilter > 0) {
-    $conditions[] = 'c.sportid = :sport_filter';
+    $conditions[] = 'cd.sportid = :sport_filter';
     $params[':sport_filter'] = $sportFilter;
 }
 
@@ -181,7 +162,7 @@ $clubSql = $baseSql;
 if (!empty($conditions)) {
     $clubSql .= ' WHERE ' . implode(' AND ', $conditions);
 }
-$clubSql .= ' ORDER BY c.creationdate DESC, c.name ASC';
+$clubSql .= ' ORDER BY cd.creationdate DESC, cd.name ASC';
 
 $clubStmt = $pdo->prepare($clubSql);
 foreach ($params as $placeholder => $value) {
@@ -462,6 +443,10 @@ include __DIR__ . '/../include/menu/menuChoice.php';
                                                 <?php endforeach; ?>
                                             </ul>
                                         <?php endif; ?>
+                                    </div>
+
+                                    <div class="club-card-actions">
+                                        <a href="clubEdit.php?id=<?php echo (int) $club['clubid']; ?>" class="btn">Edit Club</a>
                                     </div>
                                 </div>
                             </article>

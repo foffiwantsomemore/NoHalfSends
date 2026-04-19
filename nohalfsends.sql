@@ -306,9 +306,90 @@ SELECT
 FROM Activity a
 JOIN Sport s ON a.sportid = s.sportid;
 
-DELIMITER $$
+--club details with member counts and admin info
+CREATE VIEW v_club_detail AS
+SELECT
+    c.clubid,
+    c.sportid,
+    c.name,
+    c.description,
+    c.clubimage,
+    c.creationdate,
+    s.name AS sport_name,
+    s.sportimage,
+    (SELECT COUNT(*) FROM UserClub WHERE clubid = c.clubid) AS member_count,
+    (SELECT COUNT(a.activityid) 
+     FROM UserClub uc 
+     LEFT JOIN Activity a ON a.userid = uc.userid 
+     WHERE uc.clubid = c.clubid) AS activity_count,
+    (SELECT MAX(a.activitydate) 
+     FROM UserClub uc 
+     LEFT JOIN Activity a ON a.userid = uc.userid 
+     WHERE uc.clubid = c.clubid) AS last_activity_date,
+    (SELECT u.userid FROM UserClub uc2
+     INNER JOIN User u ON u.userid = uc2.userid
+     WHERE uc2.clubid = c.clubid AND uc2.admin = 1
+     ORDER BY uc2.joindate ASC, uc2.userid ASC
+     LIMIT 1) AS creator_id,
+    (SELECT u.username FROM UserClub uc2
+     INNER JOIN User u ON u.userid = uc2.userid
+     WHERE uc2.clubid = c.clubid AND uc2.admin = 1
+     ORDER BY uc2.joindate ASC, uc2.userid ASC
+     LIMIT 1) AS creator_username
+FROM Club c
+LEFT JOIN Sport s ON s.sportid = c.sportid;
+
+--club members with their roles
+CREATE VIEW v_club_members AS
+SELECT
+    uc.clubid,
+    uc.userid,
+    u.username,
+    u.name,
+    u.surname,
+    u.userimage,
+    uc.joindate,
+    uc.admin,
+    CASE 
+        WHEN uc.admin = 1 THEN 'admin'
+        ELSE 'member'
+    END AS role
+FROM UserClub uc
+INNER JOIN User u ON u.userid = uc.userid
+ORDER BY uc.admin DESC, uc.joindate ASC;
+
+--user club role check
+CREATE VIEW v_user_club_role AS
+SELECT
+    uc.userid,
+    uc.clubid,
+    uc.joindate,
+    uc.admin,
+    c.name AS club_name,
+    CASE 
+        WHEN uc.admin = 1 THEN 'admin'
+        ELSE 'member'
+    END AS role
+FROM UserClub uc
+INNER JOIN Club c ON c.clubid = uc.clubid;
+
+--club statistics summary
+CREATE VIEW v_club_stats AS
+SELECT
+    c.clubid,
+    c.name,
+    COUNT(DISTINCT uc.userid) AS total_members,
+    COUNT(DISTINCT a.activityid) AS total_activities,
+    COUNT(DISTINCT CASE WHEN uc.admin = 1 THEN uc.userid END) AS admin_count,
+    MAX(a.activitydate) AS last_activity_date
+FROM Club c
+LEFT JOIN UserClub uc ON uc.clubid = c.clubid
+LEFT JOIN Activity a ON a.userid = uc.userid
+GROUP BY c.clubid, c.name;
+
 
 /* Stored Procedures */ 
+DELIMITER $$
 
 CREATE PROCEDURE sp_update_user_profile (
     IN p_userid INT,
