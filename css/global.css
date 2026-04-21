@@ -1,23 +1,23 @@
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Special+Gothic+Expanded+One&display=swap');
 
-:root{
+:root {
   --fg-color: #ffffff;
-  --nav-bg: rgba(255,255,255,0.08);
+  --nav-bg: rgba(255, 255, 255, 0.08);
   --aurora-intensity: 0.9;
 }
 
 body {
-    font-family: 'DM Sans', sans-serif;
-    margin: 0;
-    padding: 0;
-    min-height: 100vh;
+  font-family: 'DM Sans', sans-serif;
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
-    background: #09121c;
-    color: var(--fg-color);
-    position: relative;
-    overflow-x: hidden;
-    overflow-y: hidden;
+  background: #09121c;
+  color: var(--fg-color);
+  position: relative;
+  overflow-x: hidden;
+  overflow-y: hidden;
 }
 
 body:not(.home-page) {
@@ -32,87 +32,112 @@ body:not(.home-page) {
 }
 
 /* Aurora layers (pseudo-element) */
-body::before{
-    content: "";
-    position: fixed;
-    inset: 0;
-    z-index: -2;
-    pointer-events: none;
-    background:
-      radial-gradient(42% 32% at 10% 18%, rgba(130,90,255,0.55), transparent 22%),
-      radial-gradient(56% 44% at 82% 72%, rgba(0,245,200,0.45), transparent 20%),
-      radial-gradient(34% 28% at 50% 48%, rgba(255,95,160,0.32), transparent 18%);
-    background-size: 240% 240%;
-    filter: blur(32px) saturate(1.6) contrast(1.05) brightness(1.02);
-    transform: translateZ(0);
-    animation: aurora 16s linear infinite;
-    mix-blend-mode: screen;
-    opacity: var(--aurora-intensity);
-    will-change: background-position, transform;
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  background:
+    radial-gradient(42% 32% at 10% 18%, rgba(130, 90, 255, 0.55), transparent 22%),
+    radial-gradient(56% 44% at 82% 72%, rgba(0, 245, 200, 0.45), transparent 20%),
+    radial-gradient(34% 28% at 50% 48%, rgba(255, 95, 160, 0.32), transparent 18%);
+  background-size: 240% 240%;
+  filter: blur(32px) saturate(1.6) contrast(1.05) brightness(1.02);
+  transform: translateZ(0);
+  animation: aurora 16s linear infinite;
+  mix-blend-mode: screen;
+  opacity: var(--aurora-intensity);
+  will-change: background-position, transform;
 }
 
 /* layer secondario per luci più nitide e overlay */
-body::after{
-    content: "";
-    position: fixed;
-    inset: 0;
-    z-index: -3;
-    pointer-events: none;
-    background:
-      linear-gradient(120deg, rgba(60,140,255,0.07), rgba(0,230,160,0.05));
-    filter: blur(12px) saturate(1.2);
-    transform: translateZ(0);
-    animation: aurora-slow 30s ease-in-out infinite;
-    mix-blend-mode: overlay;
-    opacity: calc(var(--aurora-intensity) * 0.9);
-    will-change: transform, opacity;
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -3;
+  pointer-events: none;
+  background:
+    linear-gradient(120deg, rgba(60, 140, 255, 0.07), rgba(0, 230, 160, 0.05));
+  filter: blur(12px) saturate(1.2);
+  transform: translateZ(0);
+  animation: aurora-slow 30s ease-in-out infinite;
+  mix-blend-mode: overlay;
+  opacity: calc(var(--aurora-intensity) * 0.9);
+  will-change: transform, opacity;
 }
 
-.home-center{
-    min-height: calc(100vh - 60px);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    padding: 3rem 1rem;
-    position: relative;
-    z-index: 1;
+.home-center {
+  min-height: calc(100vh - 60px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 3rem 1rem;
+  position: relative;
+  z-index: 1;
 }
 
-.home-center h1{
-    margin: 0;
-    color: var(--fg-color);
-    font-size: clamp(28px, 6vw, 64px);
-    letter-spacing: -0.02em;
-    text-shadow: 0 12px 40px rgba(0,0,0,0.6);
+.home-center h1 {
+  margin: 0;
+  color: var(--fg-color);
+  font-size: clamp(28px, 6vw, 64px);
+  letter-spacing: -0.02em;
+  text-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
 }
 
-.acronym-content{
+.acronym-content {
   text-align: center;
   max-width: 760px;
 }
 
-.acronym-content p{
+.acronym-content p {
   margin: 1rem 0 0;
   color: var(--fg-color);
   font-size: clamp(16px, 2.2vw, 24px);
   line-height: 1.5;
-  text-shadow: 0 8px 24px rgba(0,0,0,0.45);
+  text-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
 }
 
 /* movement */
 @keyframes aurora {
-  0%   { background-position: 0% 40%, 100% 60%, 50% 50%;}
-  25%  { background-position: 30% 30%, 70% 80%, 40% 60%;}
-  50%  { background-position: 60% 50%, 20% 40%, 50% 45%;}
-  75%  { background-position: 40% 70%, 90% 20%, 60% 55%;}
-  100% { background-position: 0% 40%, 100% 60%, 50% 50%;}
+  0% {
+    background-position: 0% 40%, 100% 60%, 50% 50%;
+  }
+
+  25% {
+    background-position: 30% 30%, 70% 80%, 40% 60%;
+  }
+
+  50% {
+    background-position: 60% 50%, 20% 40%, 50% 45%;
+  }
+
+  75% {
+    background-position: 40% 70%, 90% 20%, 60% 55%;
+  }
+
+  100% {
+    background-position: 0% 40%, 100% 60%, 50% 50%;
+  }
 }
 
 @keyframes aurora-slow {
-  0% { transform: translateY(0) scale(1); opacity: 0.95; }
-  50% { transform: translateY(-6%) scale(1.02); opacity: 1; }
-  100% { transform: translateY(0) scale(1); opacity: 0.95; }
+  0% {
+    transform: translateY(0) scale(1);
+    opacity: 0.95;
+  }
+
+  50% {
+    transform: translateY(-6%) scale(1.02);
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateY(0) scale(1);
+    opacity: 0.95;
+  }
 }
 
 .profile-page {
@@ -122,17 +147,18 @@ body::after{
   margin: 6rem auto 4rem;
   padding: 1.5rem;
   border-radius: 18px;
-  background: linear-gradient(135deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
-  border: 1px solid rgba(255,255,255,0.1);
-  box-shadow: 0 18px 60px rgba(0,0,0,0.55);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02));
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 18px 60px rgba(0, 0, 0, 0.55);
   color: #fff;
 }
 
 .profile-section {
   margin-bottom: 1.75rem;
   padding-bottom: 1.5rem;
-  border-bottom: 1px solid rgba(255,255,255,0.08);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
+
 .profile-section:last-of-type {
   border-bottom: none;
   padding-bottom: 0;
@@ -155,10 +181,11 @@ body::after{
   height: 110px;
   border-radius: 50%;
   overflow: hidden;
-  border: 2px solid rgba(255,255,255,0.3);
-  background: rgba(0,0,0,0.25);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  background: rgba(0, 0, 0, 0.25);
   flex-shrink: 0;
 }
+
 .profile-avatar img {
   width: 100%;
   height: 100%;
@@ -168,15 +195,18 @@ body::after{
 .profile-main-info h2 {
   margin: 0 0 0.3rem;
 }
+
 .profile-username {
   opacity: 0.8;
   font-size: 0.95rem;
 }
+
 .profile-description {
   margin-top: 0.5rem;
   font-size: 0.95rem;
   opacity: 0.9;
 }
+
 .profile-meta {
   margin-top: 0.4rem;
   font-size: 0.85rem;
@@ -192,8 +222,8 @@ body::after{
   display: inline-block;
   padding: 0.45rem 0.9rem;
   border-radius: 999px;
-  border: 1px solid rgba(255,255,255,0.3);
-  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.05);
   color: #fff;
   font-size: 0.9rem;
   font-weight: 600;
@@ -201,10 +231,11 @@ body::after{
   cursor: pointer;
   transition: background 150ms ease, transform 150ms ease, box-shadow 150ms ease;
 }
+
 .btn:hover {
-  background: rgba(255,255,255,0.12);
+  background: rgba(255, 255, 255, 0.12);
   transform: translateY(-1px);
-  box-shadow: 0 0 16px rgba(0,174,255,0.7);
+  box-shadow: 0 0 16px rgba(0, 174, 255, 0.7);
 }
 
 /* Sports section */
@@ -227,21 +258,24 @@ body::after{
   flex-wrap: wrap;
   gap: 0.75rem;
 }
+
 .sport-chip {
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
   padding: 0.3rem 0.7rem;
   border-radius: 999px;
-  background: rgba(0,0,0,0.25);
-  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   font-size: 0.85rem;
 }
+
 .sport-chip img {
   width: 18px;
   height: 18px;
   object-fit: contain;
 }
+
 .sports-empty {
   font-size: 0.9rem;
   opacity: 0.8;
@@ -254,16 +288,19 @@ body::after{
   gap: 1rem;
   margin-bottom: 1.25rem;
 }
+
 .analysis-card {
   padding: 0.9rem 1rem;
   border-radius: 14px;
   background: #09121c;
-  border: 1px solid rgba(255,255,255,0.12);
+  border: 1px solid rgba(255, 255, 255, 0.12);
 }
+
 .analysis-label {
   font-size: 0.85rem;
   opacity: 0.8;
 }
+
 .analysis-value {
   margin-top: 0.2rem;
   font-size: 1.4rem;
@@ -273,6 +310,7 @@ body::after{
 .recent-activities {
   margin-top: 0.5rem;
 }
+
 .recent-activities h3 {
   margin: 0 0 0.6rem;
   font-size: 1rem;
@@ -289,7 +327,7 @@ body::after{
   padding: 1rem;
   border-radius: 14px;
   background: #09121c;
-  border: 1px solid rgba(255,255,255,0.12);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   text-align: center;
 }
 
@@ -314,7 +352,7 @@ body::after{
   padding: 1.2rem 1.4rem;
   border-radius: 14px;
   background: #09121c;
-  border: 1px solid rgba(255,255,255,0.16);
+  border: 1px solid rgba(255, 255, 255, 0.16);
 }
 
 .profile-image-section {
@@ -370,8 +408,8 @@ body::after{
   width: 100%;
   padding: 0.6rem 0.75rem;
   border-radius: 10px;
-  border: 1px solid rgba(255,255,255,0.22);
-  background: rgba(255,255,255,0.09);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: rgba(255, 255, 255, 0.09);
   color: #fff;
   font-size: 0.95rem;
   outline: none;
@@ -383,7 +421,7 @@ body::after{
   padding: 1rem 1.2rem;
   border-radius: 14px;
   background: #09121c;
-  border: 1px solid rgba(255,255,255,0.16);
+  border: 1px solid rgba(255, 255, 255, 0.16);
 }
 
 .manage-sports-hint {
@@ -414,18 +452,18 @@ body::after{
   gap: 0.6rem;
   padding: 1rem 0.8rem;
   border-radius: 12px;
-  background: rgba(255,255,255,0.05);
-  border: 2px solid rgba(255,255,255,0.12);
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid rgba(255, 255, 255, 0.12);
   cursor: pointer;
   transition: all 200ms ease;
   text-align: center;
 }
 
 .sport-select-item:hover {
-  background: rgba(255,255,255,0.1);
-  border-color: rgba(0,174,255,0.6);
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(0, 174, 255, 0.6);
   transform: translateY(-3px);
-  box-shadow: 0 6px 20px rgba(0,174,255,0.2);
+  box-shadow: 0 6px 20px rgba(0, 174, 255, 0.2);
 }
 
 .sport-select-item input[type="checkbox"] {
@@ -462,7 +500,7 @@ body::after{
 
 .btn-secondary {
   background: transparent;
-  border-color: rgba(255,255,255,0.22);
+  border-color: rgba(255, 255, 255, 0.22);
 }
 
 /* Manage sports dropdown */
@@ -484,6 +522,7 @@ body::after{
     opacity: 0;
     transform: translateY(-12px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -496,8 +535,8 @@ body::after{
   padding: 1.4rem 1.6rem;
   border-radius: 14px;
   background: #09121c;
-  border: 1px solid rgba(255,255,255,0.14);
-  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
   margin-bottom: 1rem;
 }
 
@@ -536,9 +575,9 @@ body::after{
   width: min(520px, calc(100% - 2.5rem));
   padding: 1.2rem 1.4rem;
   border-radius: 16px;
-  background: rgba(3,9,20,0.98);
-  border: 1px solid rgba(255,255,255,0.16);
-  box-shadow: 0 18px 60px rgba(0,0,0,0.7);
+  background: rgba(3, 9, 20, 0.98);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  box-shadow: 0 18px 60px rgba(0, 0, 0, 0.7);
 }
 
 .modal-header {
@@ -571,8 +610,8 @@ body::after{
 .profile-edit-form input[type="text"]:focus,
 .profile-edit-form input[type="email"]:focus,
 .profile-edit-form textarea:focus {
-  border-color: rgba(255,255,255,0.5);
-  box-shadow: 0 0 0 3px rgba(255,255,255,0.12);
+  border-color: rgba(255, 255, 255, 0.5);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.12);
 }
 
 .error-message,
@@ -592,27 +631,33 @@ body::after{
   background: rgba(50, 215, 75, 0.14);
   border: 1px solid rgba(50, 215, 75, 0.6);
 }
+
 .activity-item {
   padding: 0.65rem 0.4rem;
-  border-bottom: 1px solid rgba(255,255,255,0.08);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   display: flex;
   justify-content: space-between;
   gap: 0.75rem;
   font-size: 0.92rem;
 }
+
 .activity-item:last-of-type {
   border-bottom: none;
 }
+
 .activity-main {
   flex: 1;
 }
+
 .activity-name {
   font-weight: 600;
 }
+
 .activity-meta {
   font-size: 0.8rem;
   opacity: 0.8;
 }
+
 .activity-duration {
   font-size: 0.85rem;
   opacity: 0.9;
@@ -627,23 +672,28 @@ body::after{
     margin-bottom: 2rem;
     padding: 1.1rem;
   }
+
   .profile-header {
     flex-direction: column;
     align-items: flex-start;
     gap: 1rem;
   }
+
   .profile-main-info {
     flex-basis: auto;
     width: 100%;
   }
+
   .profile-actions {
     margin-left: 0;
     margin-top: 0.25rem;
   }
+
   .community-stats {
     grid-template-columns: 1fr;
     gap: 0.75rem;
   }
+
   .analysis-grid {
     grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
     gap: 0.75rem;
@@ -658,25 +708,31 @@ body::after{
     margin-bottom: 2rem;
     padding: 1rem;
   }
+
   .profile-header {
     align-items: flex-start;
   }
+
   .profile-edit-container {
-      grid-template-columns: 1fr;
-      gap: 1.5rem;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
   }
+
   .profile-avatar {
-      width: 90px;
-      height: 90px;
+    width: 90px;
+    height: 90px;
   }
+
   .analysis-grid {
-      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-      gap: 0.75rem;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 0.75rem;
   }
+
   .sport-select-grid {
-      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-      gap: 0.6rem;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 0.6rem;
   }
+
   .activity-item {
     align-items: flex-start;
   }
@@ -686,105 +742,128 @@ body::after{
 @media (max-width: 480px) {
   .profile-page {
     width: min(calc(100% - 1.2rem), 1000px);
-    margin-top: 5rem;
-    margin-bottom: 3rem;
+    margin-top: 1rem;
+    margin-bottom: 2rem;
     padding: 1rem;
   }
+
   .profile-section {
-      margin-bottom: 1.2rem;
-      padding-bottom: 1rem;
+    margin-bottom: 1.2rem;
+    padding-bottom: 1rem;
   }
+
   .profile-header {
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
     gap: 0.9rem;
   }
+
   .profile-main-info {
     width: 100%;
   }
+
   .profile-actions {
     margin-left: 0;
   }
+
   .profile-avatar {
-      width: 80px;
-      height: 80px;
+    width: 80px;
+    height: 80px;
   }
+
   .profile-main-info h2 {
-      font-size: 1.3rem;
+    font-size: 1.3rem;
   }
+
   .section-title {
-      font-size: 1rem;
+    font-size: 1rem;
   }
+
   .sports-header {
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 0.5rem;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
   }
+
   .analysis-grid {
-      grid-template-columns: 1fr;
-      gap: 0.5rem;
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
   }
+
   .analysis-card {
-      padding: 0.7rem 0.8rem;
+    padding: 0.7rem 0.8rem;
   }
+
   .analysis-value {
-      font-size: 1.2rem;
+    font-size: 1.2rem;
   }
+
   .community-stats {
-      grid-template-columns: 1fr;
-      gap: 0.5rem;
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
   }
+
   .community-card {
-      padding: 0.8rem;
+    padding: 0.8rem;
   }
+
   .community-value {
-      font-size: 1.6rem;
+    font-size: 1.6rem;
   }
+
   .sport-select-grid {
-      grid-template-columns: repeat(2, 1fr);
-      gap: 0.5rem;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
   }
+
   .sport-select-item {
-      padding: 0.8rem 0.6rem;
-      gap: 0.4rem;
+    padding: 0.8rem 0.6rem;
+    gap: 0.4rem;
   }
+
   .sport-select-item img {
-      width: 32px;
-      height: 32px;
+    width: 32px;
+    height: 32px;
   }
+
   .sport-select-name {
-      font-size: 0.8rem;
+    font-size: 0.8rem;
   }
+
   .modal-card {
-      width: calc(100% - 1.5rem);
-      padding: 1rem 1.2rem;
+    width: calc(100% - 1.5rem);
+    padding: 1rem 1.2rem;
   }
+
   .manage-sports-content {
-      padding: 1rem 1.2rem;
-      margin-bottom: 0.75rem;
+    padding: 1rem 1.2rem;
+    margin-bottom: 0.75rem;
   }
+
   .btn {
-      padding: 0.45rem 0.75rem;
-      font-size: 0.85rem;
-      height: 20px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+    padding: 0.45rem 0.75rem;
+    font-size: 0.85rem;
+    display: flex;
+    justify-content: center;
   }
+
   .sports-list {
-      gap: 0.5rem;
+    gap: 0.5rem;
   }
+
   .sport-chip {
-      padding: 0.25rem 0.6rem;
-      font-size: 0.8rem;
+    padding: 0.25rem 0.6rem;
+    font-size: 0.8rem;
   }
+
   .activity-item {
-      flex-direction: column;
-      gap: 0.3rem;
-      padding: 0.5rem 0.2rem;
+    flex-direction: column;
+    gap: 0.3rem;
+    padding: 0.5rem 0.2rem;
   }
+
   .activity-duration {
-      text-align: left;
+    text-align: left;
   }
 }

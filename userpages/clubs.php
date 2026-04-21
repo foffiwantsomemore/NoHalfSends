@@ -243,7 +243,6 @@ $formatDateTime = static function (?string $value): string {
     }
 };
 
-include __DIR__ . '/../include/menu/menuChoice.php';
 ?>
 <!DOCTYPE html>
 <html lang="en">

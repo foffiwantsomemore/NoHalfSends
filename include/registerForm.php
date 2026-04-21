@@ -7,6 +7,7 @@
     <title>Register</title>
     <link rel="stylesheet" href="../css/form.css">
     <link rel="stylesheet" href="../css/header-footer.css">
+    <link rel="stylesheet" href="../css/global.css">
 
 </head>
 
