@@ -106,6 +106,8 @@ form br {
     display: none;
 }
 
+
+
 /* Responsive - Tablet: 768px and below */
 @media (max-width: 768px) {
   body {
@@ -136,6 +138,8 @@ form br {
     min-height: 38px;
   }
 }
+
+
 
 /* Responsive - Mobile: 480px and below */
 @media (max-width: 480px) {

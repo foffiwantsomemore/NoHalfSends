@@ -1,5 +1,11 @@
 <link rel="stylesheet" href="../../css/header-footer.css">
 
+<div class="nhsicon-button">
+    <a href="/projects/NoHalfSends/userpages/feed.php">
+        <img src="/projects/NoHalfSends/media/nhs.ico" alt="Logout Icon">
+    </a>
+</div>
+
 <nav>
     <ul>
         <li><a href="/projects/NoHalfSends/userpages/feed.php">Feed</a></li>

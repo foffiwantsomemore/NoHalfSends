@@ -1,9 +1,7 @@
 CREATE DATABASE NHS;
 USE NHS;
 
-/*Modifica codifica caratteri*/
-
-/* Create Table */
+/* Create Table*/
 CREATE TABLE User (
     userid INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(50),

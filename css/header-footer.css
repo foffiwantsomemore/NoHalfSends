@@ -1,9 +1,12 @@
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Special+Gothic+Expanded+One&display=swap');
 
-/* ===== NAVIGATION BAR ===== */
+
+
+/* Navigation Bar */
 
 nav,
-.auth-action {
+.auth-action,
+.nhsicon-button {
   position: fixed;
   top: 18px;
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.02));
@@ -63,15 +66,27 @@ nav a:hover {
   transform: translateY(-2px);
 }
 
-/* ===== AUTH ACTION BUTTON ===== */
 
-.auth-action {
-  right: 20px;
-  width: 20px;
+
+/* Auth button */
+
+.auth-action,
+.nhsicon-button {
+  position: fixed;
+  top: 18px;
   z-index: 60;
 }
 
-.auth-action a {
+.auth-action {
+  right: 20px;
+}
+
+.nhsicon-button {
+  left: 20px;
+}
+
+.auth-action a,
+.nhsicon-button a {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -82,22 +97,27 @@ nav a:hover {
   background: transparent;
 }
 
-.auth-action a img {
+.auth-action a img,
+.nhsicon-button a img {
   filter: brightness(2.5) saturate(1.8) hue-rotate(180deg);
   transition: filter 150ms ease;
 }
 
-.auth-action a:hover {
+.auth-action a:hover,
+.nhsicon-button a:hover {
   background: transparent;
   transform: none;
   filter: brightness(2) drop-shadow(0 0 12px rgba(0, 174, 255, 0.9)) drop-shadow(0 0 20px rgba(0, 174, 255, 0.5));
 }
 
-.auth-action a:hover img {
+.auth-action a:hover img,
+.nhsicon-button a:hover img {
   filter: brightness(3.5) saturate(2) hue-rotate(180deg) drop-shadow(0 0 8px rgba(0, 174, 255, 0.9));
 }
 
-/* ===== HOME PAGE ===== */
+
+
+/* Home page */
 
 html.home-page,
 body.home-page {
@@ -111,8 +131,6 @@ body:not(.home-page)::before {
   background: none !important;
   filter: none !important;
 }
-
-/* Home page - Auth action variant */
 
 html.home-page .auth-action {
   top: 20px;
@@ -227,10 +245,12 @@ html.home-page .auth-action a:hover img {
   -webkit-overflow-scrolling: touch;
 }
 
+
 /* Responsive - Tablet and below */
 @media (max-width: 768px) {
   nav,
-  .auth-action {
+  .auth-action,
+  .nhsicon-button {
     top: 12px;
     padding: 6px 12px;
     backdrop-filter: blur(12px) saturate(1.05);
@@ -238,7 +258,8 @@ html.home-page .auth-action a:hover img {
   }
   
   nav a,
-  .auth-action a {
+  .auth-action a,
+  .nhsicon-button a {
     padding: 5px 8px;
     font-size: 0.9rem;
   }

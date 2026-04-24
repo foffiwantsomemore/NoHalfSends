@@ -254,6 +254,8 @@ $formatDateTime = static function (?string $value): string {
     <link rel="stylesheet" href="../css/global.css">
     <link rel="stylesheet" href="../css/clubs.css">
     <link rel="stylesheet" href="../css/header-footer.css">
+
+
 </head>
 
 <body class="clubs-page">
