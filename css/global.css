@@ -1,5 +1,21 @@
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Special+Gothic+Expanded+One&display=swap');
 
+::-webkit-scrollbar {
+  width: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
 :root {
   --fg-color: #ffffff;
   --nav-bg: rgba(255, 255, 255, 0.08);
@@ -31,7 +47,7 @@ body:not(.home-page) {
   }
 }
 
-/* Aurora layers (pseudo-element) */
+/* Aurora layers */
 body::before {
   content: "";
   position: fixed;
@@ -51,7 +67,6 @@ body::before {
   will-change: background-position, transform;
 }
 
-/* layer secondario per luci più nitide e overlay */
 body::after {
   content: "";
   position: fixed;
@@ -140,6 +155,9 @@ body::after {
   }
 }
 
+
+/* Profile page */
+
 .profile-page {
   width: min(100%, 1000px);
   box-sizing: border-box;
@@ -172,13 +190,13 @@ body::after {
 }
 
 .profile-main-info {
-  flex: 1 1 320px;
   min-width: 0;
 }
 
 .profile-avatar {
-  width: 110px;
-  height: 110px;
+  width: 280px;
+  height: 280px;
+  margin: 0 auto;
   border-radius: 50%;
   overflow: hidden;
   border: 2px solid rgba(255, 255, 255, 0.3);
@@ -238,6 +256,8 @@ body::after {
   box-shadow: 0 0 16px rgba(0, 174, 255, 0.7);
 }
 
+
+
 /* Sports section */
 .section-title {
   margin: 0 0 0.75rem;
@@ -281,6 +301,8 @@ body::after {
   opacity: 0.8;
 }
 
+
+
 /* Analysis section */
 .analysis-grid {
   display: grid;
@@ -316,6 +338,8 @@ body::after {
   font-size: 1rem;
 }
 
+
+
 /* Community section */
 .community-stats {
   display: grid;
@@ -343,6 +367,8 @@ body::after {
   margin-top: 0.25rem;
 }
 
+
+
 /* Edit profile page */
 .profile-edit-container {
   display: grid;
@@ -359,6 +385,7 @@ body::after {
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  align-items: center;
 }
 
 .profile-image-block,
@@ -411,9 +438,13 @@ body::after {
   border: 1px solid rgba(255, 255, 255, 0.22);
   background: rgba(255, 255, 255, 0.09);
   color: #fff;
+  font-family: 'DM Sans', sans-serif;
   font-size: 0.95rem;
   outline: none;
+  transition: border-color 150ms ease, box-shadow 150ms ease, background 150ms ease;
 }
+
+
 
 /* Manage sports page */
 .manage-sports-page .manage-sports-form {
@@ -429,6 +460,8 @@ body::after {
   opacity: 0.85;
   margin: 0.25rem 0 0.9rem;
 }
+
+
 
 /* Dropdown form styling */
 .manage-sports-dropdown .manage-sports-form {
@@ -502,6 +535,8 @@ body::after {
   background: transparent;
   border-color: rgba(255, 255, 255, 0.22);
 }
+
+
 
 /* Manage sports dropdown */
 .manage-sports-dropdown {
@@ -611,7 +646,57 @@ body::after {
 .profile-edit-form input[type="email"]:focus,
 .profile-edit-form textarea:focus {
   border-color: rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.14);
   box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.12);
+}
+
+.profile-image-form input[type="file"],
+.profile-edit-form input[type="file"] {
+  display: block;
+  margin-top: 0.5rem;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px dashed rgba(255, 255, 255, 0.3);
+  border-radius: 10px;
+  color: #fff;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.95rem;
+  cursor: pointer;
+  box-sizing: border-box;
+  transition: all 150ms ease;
+}
+
+.profile-image-form input[type="file"]:hover,
+.profile-edit-form input[type="file"]:hover {
+  border-color: rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.profile-image-form input[type="file"]:focus,
+.profile-edit-form input[type="file"]:focus {
+  outline: none;
+  border-color: rgba(255, 255, 255, 0.6);
+  background: rgba(255, 255, 255, 0.12);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
+}
+
+.profile-image-form input[type="file"]::file-selector-button,
+.profile-edit-form input[type="file"]::file-selector-button {
+  background: rgba(255, 255, 255, 0.15);
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  color: #fff;
+  cursor: pointer;
+  font-weight: 600;
+  font-family: 'DM Sans', sans-serif;
+  transition: background 150ms ease;
+}
+
+.profile-image-form input[type="file"]::file-selector-button:hover,
+.profile-edit-form input[type="file"]::file-selector-button:hover {
+  background: rgba(255, 255, 255, 0.25);
 }
 
 .error-message,
@@ -664,6 +749,8 @@ body::after {
   white-space: nowrap;
 }
 
+
+
 /* Tablet: 900px and below */
 @media (max-width: 900px) {
   .profile-page {
@@ -699,6 +786,8 @@ body::after {
     gap: 0.75rem;
   }
 }
+
+
 
 /* Tablet: 768px and below */
 @media (max-width: 768px) {
@@ -737,6 +826,8 @@ body::after {
     align-items: flex-start;
   }
 }
+
+
 
 /* Mobile: 480px and below */
 @media (max-width: 480px) {

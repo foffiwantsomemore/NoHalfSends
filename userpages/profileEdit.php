@@ -93,32 +93,26 @@ if (!$user) {
                     <?php endif; ?>
                 </div>
 
-                <div class="profile-main-info">
-                    <h3><?php echo htmlspecialchars($user['name'] . ' ' . $user['surname'], ENT_QUOTES); ?></h3>
-                    <?php if (!empty($user['username'])): ?>
-                        <div class="profile-username">@<?php echo htmlspecialchars($user['username'], ENT_QUOTES); ?></div>
-                    <?php endif; ?>
-                </div>
+                            <div class="profile-image-actions">
+                <form action="uploadProfileImage.php" method="post" enctype="multipart/form-data" class="profile-image-form">
+                    <label for="userimage">Cambia immagine profilo:</label>
+                    <input type="file" name="userimage" id="userimage" accept="image/*" required>
+                </form>
 
-                <div class="profile-image-actions">
-                    <form action="uploadProfileImage.php" method="post" enctype="multipart/form-data" class="profile-image-form">
-                        <label for="userimage">Cambia immagine profilo:</label>
-                        <input type="file" name="userimage" id="userimage" accept="image/*" required>
+                <div class="profile-image-buttons-wrapper">
+                    <form action="uploadProfileImage.php" method="post" enctype="multipart/form-data">
+                        <button type="submit" class="btn">Carica</button>
                     </form>
 
-                    <div class="profile-image-buttons-wrapper">
-                        <form action="uploadProfileImage.php" method="post" enctype="multipart/form-data">
-                            <button type="submit" class="btn">Carica</button>
+                    <?php if (!empty($user['userimage'])): ?>
+                        <form action="uploadProfileImage.php" method="post">
+                            <input type="hidden" name="remove_profile" value="1">
+                            <button type="submit" class="btn">Rimuovi immagine profilo</button>
                         </form>
-
-                        <?php if (!empty($user['userimage'])): ?>
-                            <form action="uploadProfileImage.php" method="post">
-                                <input type="hidden" name="remove_profile" value="1">
-                                <button type="submit" class="btn">Rimuovi immagine profilo</button>
-                            </form>
-                        <?php endif; ?>
-                    </div>
+                    <?php endif; ?>
                 </div>
+            </div>
+
             </div>
 
             <!--dati profilo base-->
@@ -150,6 +144,7 @@ if (!$user) {
 
             <button type="submit" class="btn">Salva modifiche</button>
             </form>
+
         </div>
 
         <p style="margin-top: 1rem;">
