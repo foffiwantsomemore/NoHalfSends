@@ -97,6 +97,73 @@ $sthRecent = $pdo->prepare($sqlRecent);
 $sthRecent->bindValue(':uid', $userId, PDO::PARAM_INT);
 $sthRecent->execute();
 $recentActivities = $sthRecent->fetchAll();
+
+// sport distribution for donut chart
+$sqlSportDistribution = "
+    SELECT sport_name, COUNT(*) AS total
+    FROM v_user_activities
+    WHERE userid = :uid
+    GROUP BY sport_name
+    ORDER BY total DESC, sport_name ASC
+";
+$sthSportDistribution = $pdo->prepare($sqlSportDistribution);
+$sthSportDistribution->bindValue(':uid', $userId, PDO::PARAM_INT);
+$sthSportDistribution->execute();
+$sportDistributionRows = $sthSportDistribution->fetchAll();
+
+$sportDistributionLabels = [];
+$sportDistributionData = [];
+foreach ($sportDistributionRows as $row) {
+    $sportDistributionLabels[] = $row['sport_name'];
+    $sportDistributionData[] = (int)$row['total'];
+}
+
+// weekly distance (last 7 days) for line chart, in km
+$sqlWeeklyDistance = "
+    SELECT
+        DATE(a.activitydate) AS activity_day,
+        ROUND(
+            SUM(
+                COALESCE(
+                    r.distance,
+                    c.distance,
+                    e.distance,
+                    s.distance,
+                    sw.distance / 1000,
+                    0
+                )
+            ),
+            2
+        ) AS total_distance
+    FROM Activity a
+    LEFT JOIN Run r ON r.activityid = a.activityid
+    LEFT JOIN Cycling c ON c.activityid = a.activityid
+    LEFT JOIN Excursion e ON e.activityid = a.activityid
+    LEFT JOIN Ski s ON s.activityid = a.activityid
+    LEFT JOIN Swimming sw ON sw.activityid = a.activityid
+    WHERE a.userid = :uid
+      AND a.activitydate >= DATE_SUB(CURDATE(), INTERVAL 6 DAY)
+    GROUP BY DATE(a.activitydate)
+    ORDER BY activity_day ASC
+";
+$sthWeeklyDistance = $pdo->prepare($sqlWeeklyDistance);
+$sthWeeklyDistance->bindValue(':uid', $userId, PDO::PARAM_INT);
+$sthWeeklyDistance->execute();
+$weeklyDistanceRows = $sthWeeklyDistance->fetchAll();
+
+$weeklyDistanceByDay = [];
+foreach ($weeklyDistanceRows as $row) {
+    $weeklyDistanceByDay[$row['activity_day']] = (float)$row['total_distance'];
+}
+
+$weeklyDistanceLabels = [];
+$weeklyDistanceData = [];
+for ($i = 6; $i >= 0; $i--) {
+    $date = new DateTime('-' . $i . ' day');
+    $dayKey = $date->format('Y-m-d');
+    $weeklyDistanceLabels[] = $date->format('d/m');
+    $weeklyDistanceData[] = $weeklyDistanceByDay[$dayKey] ?? 0;
+}
 ?>
 
 <!DOCTYPE html>
@@ -242,6 +309,21 @@ $recentActivities = $sthRecent->fetchAll();
                 </div>
             </div>
         </div>
+
+        <div class="charts-grid">
+            <div class="analysis-card chart-card">
+                <div class="analysis-label">Sport distribution in activities</div>
+                <div class="chart-canvas-wrap">
+                    <canvas id="sportDistributionChart"></canvas>
+                </div>
+            </div>
+            <div class="analysis-card chart-card">
+                <div class="analysis-label">Weekly distance (km)</div>
+                <div class="chart-canvas-wrap">
+                    <canvas id="weeklyDistanceChart"></canvas>
+                </div>
+            </div>
+        </div>
     </section>
 
     <!--recent activities-->
@@ -288,8 +370,14 @@ $recentActivities = $sthRecent->fetchAll();
     </section>
 
 </div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
+    var sportLabels = <?php echo json_encode($sportDistributionLabels, JSON_UNESCAPED_UNICODE); ?>;
+    var sportData = <?php echo json_encode($sportDistributionData, JSON_UNESCAPED_UNICODE); ?>;
+    var weeklyDistanceLabels = <?php echo json_encode($weeklyDistanceLabels, JSON_UNESCAPED_UNICODE); ?>;
+    var weeklyDistanceData = <?php echo json_encode($weeklyDistanceData, JSON_UNESCAPED_UNICODE); ?>;
+
     var openBtn = document.getElementById('open-manage-sports');
     var dropdown = document.getElementById('manage-sports-dropdown');
     var closeBtn = document.getElementById('close-manage-sports');
@@ -315,6 +403,96 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     if (cancelBtn) {
         cancelBtn.addEventListener('click', closeDropdown);
+    }
+
+    if (typeof Chart !== 'undefined') {
+        var donutCanvas = document.getElementById('sportDistributionChart');
+        var lineCanvas = document.getElementById('weeklyDistanceChart');
+
+        var donutHasData = sportData.length > 0;
+        var donutDatasetData = donutHasData ? sportData : [1];
+        var donutDatasetLabels = donutHasData ? sportLabels : ['No activities'];
+        var donutColors = ['#00eeff', '#36a2eb', '#4bc0c0', '#2ecc71', '#f1c40f', '#ff9f40', '#ff6384', '#9966ff'];
+
+        if (donutCanvas) {
+            new Chart(donutCanvas, {
+                type: 'doughnut',
+                data: {
+                    labels: donutDatasetLabels,
+                    datasets: [{
+                        data: donutDatasetData,
+                        backgroundColor: donutHasData
+                            ? donutDatasetLabels.map(function (_, idx) {
+                                return donutColors[idx % donutColors.length];
+                            })
+                            : ['rgba(255, 255, 255, 0.25)'],
+                        borderColor: 'rgba(9, 18, 28, 1)',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#ffffff'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        if (lineCanvas) {
+            new Chart(lineCanvas, {
+                type: 'line',
+                data: {
+                    labels: weeklyDistanceLabels,
+                    datasets: [{
+                        label: 'Distance (km)',
+                        data: weeklyDistanceData,
+                        borderColor: '#00eeff',
+                        backgroundColor: 'rgba(0, 238, 255, 0.22)',
+                        pointBackgroundColor: '#00eeff',
+                        pointRadius: 3,
+                        borderWidth: 2,
+                        tension: 0.35,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            ticks: {
+                                color: 'rgba(255, 255, 255, 0.85)'
+                            },
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.08)'
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                color: 'rgba(255, 255, 255, 0.85)'
+                            },
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.08)'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#ffffff'
+                            }
+                        }
+                    }
+                }
+            });
+        }
     }
 });
 </script>
