@@ -1114,3 +1114,288 @@ body::after {
     .feed-container { flex-direction: column; }
     .feed-sidebar { width: 100%; }
 }
+
+/* ===========================
+   Advice Page
+   =========================== */
+.advice-container {
+    max-width: 800px;
+    margin: 6rem auto 4rem;
+    padding: 0 1rem;
+}
+
+.advice-page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.advice-card {
+    background-color: #09121c;
+    border-radius: 14px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.advice-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.advice-author-img {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.advice-meta {
+    flex: 1;
+}
+
+.advice-meta h4 {
+    margin: 0;
+    font-size: 1.1rem;
+    color: #fff;
+}
+
+.advice-meta span {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.advice-category {
+    background: rgba(0, 238, 255, 0.15);
+    color: #00eeff;
+    padding: 0.25rem 0.75rem;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    flex-shrink: 0;
+}
+
+.advice-title {
+    margin: 0 0 1rem 0;
+    font-size: 1.5rem;
+    color: #fff;
+}
+
+.advice-content {
+    margin-bottom: 1.5rem;
+    line-height: 1.65;
+    color: rgba(255, 255, 255, 0.85);
+}
+
+.advice-photo {
+    width: 100%;
+    max-height: 500px;
+    object-fit: cover;
+    border-radius: 10px;
+    margin-bottom: 1.5rem;
+    display: block;
+}
+
+.advice-actions {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.advice-actions form {
+    display: flex;
+    align-items: center;
+    margin: 0;
+    padding: 0;
+}
+
+.action-btn {
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 1rem;
+    font-family: inherit;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    line-height: 1;
+    gap: 0.5rem;
+    padding: 0;
+    transition: color 0.2s;
+}
+
+.action-btn:hover {
+    color: #00eeff;
+}
+
+.action-btn.liked {
+    color: #ff4757;
+}
+
+/* Comments */
+.comments-section {
+    margin-top: 1.5rem;
+    background: rgba(0, 0, 0, 0.2);
+    padding: 1rem;
+    border-radius: 10px;
+    display: none;
+}
+
+.comment-item {
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.comment-item:last-child {
+    margin-bottom: 0.5rem;
+    padding-bottom: 0;
+    border-bottom: none;
+}
+
+.comment-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.25rem;
+}
+
+.comment-header strong {
+    font-size: 0.9rem;
+    color: #fff;
+}
+
+.comment-header span {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.comment-text {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.85);
+    margin: 0;
+}
+
+.comment-form {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+.comment-form input[type="text"] {
+    flex: 1;
+    padding: 0.5rem 0.75rem;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    background: rgba(255, 255, 255, 0.05);
+    color: #fff;
+    font-family: inherit;
+    font-size: 0.9rem;
+    outline: none;
+    transition: border-color 150ms ease, background 150ms ease;
+    margin-bottom: 0;
+}
+
+.comment-form input[type="text"]:focus {
+    border-color: rgba(255, 255, 255, 0.5);
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* Admin Publish Form */
+.admin-form-container {
+    background: #09121c;
+    border-radius: 14px;
+    padding: 1.5rem;
+    margin-bottom: 2.5rem;
+    border: 1px solid #00eeff;
+    box-shadow: 0 4px 24px rgba(0, 238, 255, 0.1);
+    animation: slideDown 200ms ease-out;
+}
+
+.admin-form-title {
+    margin: 0 0 1.25rem;
+    font-size: 1.15rem;
+    color: #00eeff;
+}
+
+.advice-admin-form label {
+    display: block;
+    margin-bottom: 0.4rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.85);
+}
+
+.advice-admin-form input[type="text"],
+.advice-admin-form select,
+.advice-admin-form textarea {
+    box-sizing: border-box;
+    width: 100%;
+    padding: 0.7rem 0.8rem;
+    margin-bottom: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    border-radius: 10px;
+    font-size: 0.95rem;
+    font-family: inherit;
+    color: #fff;
+    background: rgba(255, 255, 255, 0.07);
+    outline: none;
+    transition: border-color 150ms ease, background 150ms ease, box-shadow 150ms ease;
+}
+
+.advice-admin-form select {
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23ffffff' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.9rem center;
+    padding-right: 2.5rem;
+}
+
+.advice-admin-form select option {
+    background: #09121c;
+    color: #fff;
+}
+
+.advice-admin-form input[type="text"]:focus,
+.advice-admin-form select:focus,
+.advice-admin-form textarea:focus {
+    border-color: rgba(0, 238, 255, 0.5);
+    background: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 0 0 3px rgba(0, 238, 255, 0.08);
+}
+
+.advice-admin-form textarea {
+    resize: vertical;
+    min-height: 120px;
+    line-height: 1.5;
+}
+
+.advice-admin-form input[type="file"] {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    margin-bottom: 1.25rem;
+    padding: 0.7rem 0.8rem;
+    border: 2px dashed rgba(255, 255, 255, 0.3);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.04);
+    color: #fff;
+    font-family: inherit;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: border-color 150ms ease, background 150ms ease;
+}
+
+.advice-admin-form input[type="file"]:hover {
+    border-color: rgba(0, 238, 255, 0.5);
+    background: rgba(255, 255, 255, 0.07);
+}
