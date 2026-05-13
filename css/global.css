@@ -987,3 +987,130 @@ body::after {
     text-align: left;
   }
 }
+
+/* Feed Page Styles */
+.feed-container {
+    display: flex;
+    max-width: 1000px;
+    margin: 6rem auto 4rem;
+    padding: 2rem 1rem;
+    gap: 2rem;
+}
+.feed-main {
+    flex: 1;
+}
+.feed-sidebar {
+    width: 300px;
+    flex-shrink: 0;
+}
+.feed-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+.activity-card {
+    background-color: var(--color-surface);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    border: 1px solid var(--color-border);
+}
+.activity-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+.activity-user-img {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+.activity-meta {
+    flex: 1;
+}
+.activity-meta h4 {
+    margin: 0;
+    font-size: 1rem;
+    color: var(--color-text-primary);
+}
+.activity-meta span {
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+}
+.activity-sport-icon {
+    width: 32px;
+    height: 32px;
+}
+.activity-body h3 {
+    margin: 0 0 0.5rem 0;
+    color: var(--color-primary);
+}
+.activity-stats {
+    display: flex;
+    gap: 2rem;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--color-border);
+}
+.stat-item {
+    display: flex;
+    flex-direction: column;
+}
+.stat-item .label {
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+}
+.stat-item .value {
+    font-weight: 600;
+    color: var(--color-text-primary);
+    font-size: 1.1rem;
+}
+
+/* Recommended Box */
+.recommended-box {
+    background-color: var(--color-surface);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+    border: 1px solid var(--color-border);
+}
+.recommended-box h3 {
+    margin-top: 0;
+    margin-bottom: 1rem;
+}
+.rec-user {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+.rec-user:hover {
+    opacity: 0.8;
+}
+.rec-user img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+.rec-user-info {
+    flex: 1;
+}
+.rec-user-info strong {
+    display: block;
+    font-size: 0.95rem;
+    color: var(--color-text-primary);
+}
+.rec-user-info span {
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+}
+
+@media (max-width: 768px) {
+    .feed-container { flex-direction: column; }
+    .feed-sidebar { width: 100%; }
+}

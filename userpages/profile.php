@@ -1,12 +1,25 @@
 <?php
+require_once __DIR__ . '/../include/header.php';
 
 $pdo = DBHandler::getPDO();
 
-$userId = $_SESSION['userId'] ?? null;
-/*if (!$userId) {
+$loggedInUserId = $_SESSION['userId'] ?? null;
+$userId = isset($_GET['id']) ? (int)$_GET['id'] : $loggedInUserId;
+
+if (!$userId) {
     header('Location: ../include/loginForm.php');
     exit;
-}*/
+}
+
+$isOwnProfile = ($loggedInUserId === $userId);
+$isFollowing = false;
+
+if (!$isOwnProfile && $loggedInUserId && $userId) {
+    $sqlCheck = "SELECT 1 FROM Follow WHERE followerid = :fid AND followedid = :uid";
+    $sthCheck = $pdo->prepare($sqlCheck);
+    $sthCheck->execute([':fid' => $loggedInUserId, ':uid' => $userId]);
+    $isFollowing = (bool)$sthCheck->fetch();
+}
 
 //user basic info
 $sqlUser = "
@@ -82,21 +95,24 @@ $sthWeekly->execute();
 $weekly = $sthWeekly->fetch() ?: ['activities' => 0, 'hours' => 0];
 
 //recent activities
-$sqlRecent = "
-    SELECT activityid,
-           activity_name,
-           sport_name,
-           activitydate,
-           duration
-    FROM v_user_activities
-    WHERE userid = :uid
-    ORDER BY activitydate DESC
-    LIMIT 5
-";
-$sthRecent = $pdo->prepare($sqlRecent);
-$sthRecent->bindValue(':uid', $userId, PDO::PARAM_INT);
-$sthRecent->execute();
-$recentActivities = $sthRecent->fetchAll();
+$recentActivities = [];
+if ($isOwnProfile || $isFollowing) {
+    $sqlRecent = "
+        SELECT activityid,
+               activity_name,
+               sport_name,
+               activitydate,
+               duration
+        FROM v_user_activities
+        WHERE userid = :uid
+        ORDER BY activitydate DESC
+        LIMIT 5
+    ";
+    $sthRecent = $pdo->prepare($sqlRecent);
+    $sthRecent->bindValue(':uid', $userId, PDO::PARAM_INT);
+    $sthRecent->execute();
+    $recentActivities = $sthRecent->fetchAll();
+}
 
 // sport distribution for donut chart
 $sqlSportDistribution = "
@@ -214,7 +230,20 @@ for ($i = 6; $i >= 0; $i--) {
             </div>
 
             <div class="profile-actions">
-                <a href="../userpages/profileEdit.php" class="btn">Edit profile</a>
+                <?php if ($isOwnProfile): ?>
+                    <a href="../userpages/profileEdit.php" class="btn">Edit profile</a>
+                <?php else: ?>
+                    <form method="post" action="feed.php" style="display:inline;">
+                        <input type="hidden" name="target_id" value="<?php echo $userId; ?>">
+                        <?php if ($isFollowing): ?>
+                            <input type="hidden" name="action" value="unfollow">
+                            <button type="submit" class="btn btn-secondary">Unfollow</button>
+                        <?php else: ?>
+                            <input type="hidden" name="action" value="follow">
+                            <button type="submit" class="btn">Follow</button>
+                        <?php endif; ?>
+                    </form>
+                <?php endif; ?>
             </div>
         </div>
     </section>
@@ -239,7 +268,9 @@ for ($i = 6; $i >= 0; $i--) {
     <section class="profile-section">
         <div class="sports-header">
             <h2 class="section-title">Sports practiced</h2>
-            <button type="button" class="btn" id="open-manage-sports">Add sport</button>
+            <?php if ($isOwnProfile): ?>
+                <button type="button" class="btn" id="open-manage-sports">Add sport</button>
+            <?php endif; ?>
         </div>
         
         <!-- Manage sports dropdown -->
@@ -330,7 +361,9 @@ for ($i = 6; $i >= 0; $i--) {
     <section class="profile-section">
         <h2 class="section-title">Recent activities</h2>
         <div class="recent-activities">
-            <?php if (count($recentActivities) === 0): ?>
+            <?php if (!$isOwnProfile && !$isFollowing): ?>
+                <p class="sports-empty">Follow this user to see their recent activities.</p>
+            <?php elseif (count($recentActivities) === 0): ?>
                 <p class="sports-empty">No activities published yet.</p>
             <?php else: ?>
                 <?php foreach ($recentActivities as $act): ?>
