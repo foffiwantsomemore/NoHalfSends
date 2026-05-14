@@ -1,76 +1,126 @@
-# NHS
+# NHS - No Half Sends
 
-###### The acronym NHS stands for *No Half Sends*, meaning to never do things halfway.
+No Half Sends is a sports-oriented social network where registered users can publish activities, follow other athletes, join sport-specific clubs, and read advice about training, nutrition, and recovery.
 
-The project consists of the development of a sports-oriented social network where registered users can share their activities and interact with other sports enthusiasts.
-
-## User Profiles
-After registering or logging in, each user has a personal profile associated with one or more sports (cycling, running, skiing, etc.).
-
-Users can:
-- Publish sports activities
-- Follow other users
-- Join sport-specific clubs
-- Interact through likes and comments
-
-Each activty may include:
-- 📊 Data related to the activity
-- 📝 Descriptions
-- 📷 Optional photographs  
-The data collected varies depending on the type of sport practiced.
+The name comes from the idea of never doing things halfway.
 
 ## Main Features
-- 👀 View activities posted by followed users
-- 🏃‍♂️ Filter activities by sport
-- ❤️ Like activities
-- 💬 Comment on activities
-- 🗓️ Weekly and monthly summaries inside the user profile
-- 🥗 Advice page dedicated to sport and nutrition
-- 👥 Follow / subscription system between users
-- 🏆 Sport-specific clubs with member roles
 
-## Clubs System
-Users can join multiple clubs, and each club belongs to a single sport.
-Features include:
-- Many-to-many relationship between users and clubs
-- Join date tracking
-- Role management inside the club (member, admin)
-- Dynamic member count (calculated via query)
+- User registration and login
+- Personal athlete profile with image, description, followed users, followers, sports practiced, statistics, and recent activities
+- Activity feed with posts from the user and followed athletes
+- Sport-specific activity data for running, cycling, swimming, skiing, gym, and excursions
+- Activity photos, likes, comments, and editing
+- Follow/unfollow system between users
+- Suggested athletes in the feed
+- Clubs grouped by sport, with member/admin roles and club editing
+- Advice page with likes, comments, photos, and admin-only creation/editing
+- Responsive interface with shared navigation and page styling
 
-## Activity Specialization
-Activities inherit common attributes (date, duration, calories, etc.)  
-Each sport has specific technical data, implemented through specialization tables.
-This structure ensures normalization and avoids redundant data.
+## Custom Framework
+
+The project uses a lightweight custom PHP framework based on `.htaccess`, `pages.json`, and `menuChoice.php`.
+
+The `.htaccess` file uses `auto_prepend_file` to load `include/menu/menuChoice.php` before most PHP pages:
+
+```apache
+php_value auto_prepend_file "/XAMPP/htdocs/projects/NoHalfSends/include/menu/menuChoice.php"
+```
+
+`menuChoice.php` reads `include/pages.json` and decides what each page needs:
+
+- `loggedInPages`: pages that require an authenticated user
+- `DBPages`: pages that need the database handler
+- `userpages`: pages that use the logged-in user navigation
+- `homeOnly`: public pages that use the public navigation
+- `adminpages`: admin-only pages
+
+This keeps repeated session, login, database, and navigation setup out of individual pages as much as possible.
 
 ## Access Control
-🛡️ Some features are only accessible to authenticated users:
-- Posting activities
-- Commenting
-- Liking
-- Joining clubs
-- Following users
 
-🚫 Administrative pages are accessible exclusively to users with admin privileges.
+Pages listed in `loggedInPages` are protected through `include/header.php`, which starts the session, includes the database handler, and checks authentication through `include/loggedIn.php`.
 
-## Framework Architecture
-The project uses a lightweight custom framework based on:
-- `.htaccess` for URL rewriting and centralized routing
-- A `menuchoice` controller that dynamically loads pages
-- A JSON-based page classification system
-Each page is defined inside a JSON configuration file specifying its category and requirements, such as:
-- Login required
-- Admin access required
-- Database connection needed
-- Header and footer inclusion
-The `menuchoice` component reads the JSON configuration and automatically includes or requires the necessary files depending on the page type.
+Pages that only need the database, such as login and register actions, are listed in `DBPages`.
 
-This structure allows:
-- Cleaner code organization  
-- Reusable components (header, footer, authentication checks)  
-- Centralized access control  
-- Simplified scalability and maintainability  
+Admin-only UI is handled inside the relevant pages, for example the advice editing and publishing controls are shown only to users with the `admin` role.
+
+## Database
+
+The database schema is stored in `nohalfsends.sql`.
+
+Main tables include:
+
+- `User`
+- `Sport`
+- `Club`
+- `UserClub`
+- `SportUser`
+- `Activity`
+- Sport specialization tables such as `Run`, `Cycling`, `Swimming`, `Ski`, `Gym`, and `Excursion`
+- `ActivityLike`, `ActivityComment`, `ActivityPhoto`
+- `Follow`
+- `Advice`, `AdviceLike`, `AdviceComment`, `AdvicePhoto`
+
+The project also uses views to keep recurring queries cleaner:
+
+- `v_user_profile`
+- `v_user_sports`
+- `v_user_activities`
+- `v_club_detail`
+- `v_user_followers`
+- `v_user_following`
+
+There are currently no required stored procedures in the active application code.
+
+## Activity Specialization
+
+Each activity stores common information in `Activity`, such as user, sport, date, duration, calories, elevation gain, and description.
+
+Sport-specific metrics are stored in dedicated tables. For example:
+
+- Running and cycling can store distance, pace/speed, heart rate, cadence, and elevation data
+- Swimming can store pool/open-water data, distance, stroke type, laps, and pace
+- Ski activities can store specialization-specific information through ski-related tables
+- Gym activities can store training-specific data
+
+This keeps the database normalized and avoids storing many unused columns in the base activity table.
+
+## Clubs
+
+Users can create and join clubs. Each club belongs to one sport and has:
+
+- Name, description, image, and creation date
+- Member count
+- Activity count from club members
+- Creator/admin information
+- Recent activity preview
+
+Club creators are stored as admins in the `UserClub` relationship table.
+
+## Advice
+
+The advice page contains articles grouped by category:
+
+- Nutrition
+- Training
+- Recovery
+
+Users can like and comment on advice. Admin users can create and edit advice posts, including optional images.
+
+## Media Uploads
+
+Uploaded media is stored under:
+
+- `images/users/`
+- `images/activities/`
+- `images/clubs/`
+- `images/advice/`
+
+Default assets and icons are stored under `media/` and `images/sports/`.
 
 ## Scheme
-Here you can find all the scheme of the project
+
+Project scheme:
 
 ![Scheme](media/ProjectScheme.svg)
