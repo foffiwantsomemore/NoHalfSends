@@ -170,7 +170,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-include __DIR__ . '/../include/menu/menuChoice.php';
 ?>
 
 <!DOCTYPE html>
@@ -184,6 +183,8 @@ include __DIR__ . '/../include/menu/menuChoice.php';
     <link rel="stylesheet" href="../css/clubs.css">
 </head>
 <body>
+    <?php include __DIR__ . '/../include/menu/menuChoice.php'; ?>
+
     <div class="club-edit-container">
         <div class="club-edit-header">
             <div class="club-edit-header-image">
@@ -260,10 +261,7 @@ include __DIR__ . '/../include/menu/menuChoice.php';
                 <div class="form-actions">
                     <button type="submit" class="btn">Upload Image</button>
                     <?php if (!empty($club['clubimage'])): ?>
-                        <form method="post" action="clubEdit.php?id=<?php echo (int) $clubId; ?>" style="display: inline;">
-                            <input type="hidden" name="action" value="delete_image">
-                            <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete the club image?');">Delete Image</button>
-                        </form>
+                        <button type="submit" name="action" value="delete_image" class="btn btn-danger" formnovalidate onclick="return confirm('Are you sure you want to delete the club image?');">Delete Image</button>
                     <?php endif; ?>
                 </div>
             </form>

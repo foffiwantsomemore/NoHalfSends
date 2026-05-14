@@ -1,5 +1,7 @@
 <?php
-//session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 require_once __DIR__ . '/../include/dbHandler.php';
 
 $userId = isset($_SESSION['userId']) ? (int) $_SESSION['userId'] : 0;
@@ -259,6 +261,7 @@ $formatDateTime = static function (?string $value): string {
 </head>
 
 <body class="clubs-page">
+    <?php include __DIR__ . '/../include/menu/menuChoice.php'; ?>
 
     <main class="clubs-shell">
         <section class="clubs-hero">
@@ -369,12 +372,18 @@ $formatDateTime = static function (?string $value): string {
             </article>
         </section>
 
-        <section class="clubs-section">
+        <section class="clubs-section clubs-collapsible" id="your-clubs-section">
             <div class="clubs-section-header">
-                <h2 class="section-title">Your clubs</h2>
-                <span class="clubs-section-note">Created and joined clubs are shown separately.</span>
+                <div>
+                    <h2 class="section-title">Your clubs</h2>
+                    <span class="clubs-section-note">Created and joined clubs are shown separately.</span>
+                </div>
+                <button type="button" class="clubs-toggle-btn" aria-expanded="true" aria-controls="your-clubs-content" data-toggle-target="your-clubs-content">
+                    <span class="clubs-toggle-icon" aria-hidden="true"></span>
+                </button>
             </div>
 
+            <div class="clubs-collapsible-content" id="your-clubs-content">
             <div class="clubs-subsection">
                 <div class="clubs-subsection-header">
                     <h3>Created by you</h3>
@@ -532,14 +541,21 @@ $formatDateTime = static function (?string $value): string {
                     </div>
                 <?php endif; ?>
             </div>
+            </div>
         </section>
 
-        <section class="clubs-section">
+        <section class="clubs-section clubs-collapsible" id="discover-clubs-section">
             <div class="clubs-section-header">
-                <h2 class="section-title">Discover clubs</h2>
-                <span class="clubs-section-note">Results reflect your current search and sport filter.</span>
+                <div>
+                    <h2 class="section-title">Discover clubs</h2>
+                    <span class="clubs-section-note">Results reflect your current search and sport filter.</span>
+                </div>
+                <button type="button" class="clubs-toggle-btn" aria-expanded="true" aria-controls="discover-clubs-content" data-toggle-target="discover-clubs-content">
+                    <span class="clubs-toggle-icon" aria-hidden="true"></span>
+                </button>
             </div>
 
+            <div class="clubs-collapsible-content" id="discover-clubs-content">
             <?php if (empty($clubs)): ?>
                 <p class="clubs-empty">No clubs match the current filters yet. Create the first one or clear the search.</p>
             <?php else: ?>
@@ -625,8 +641,22 @@ $formatDateTime = static function (?string $value): string {
                     <?php endforeach; ?>
                 </div>
             <?php endif; ?>
+            </div>
         </section>
     </main>
+
+    <script>
+        document.querySelectorAll('.clubs-toggle-btn').forEach(button => {
+            button.addEventListener('click', () => {
+                const content = document.getElementById(button.dataset.toggleTarget);
+                const isOpen = button.getAttribute('aria-expanded') === 'true';
+                button.setAttribute('aria-expanded', isOpen ? 'false' : 'true');
+                if (content) {
+                    content.hidden = isOpen;
+                }
+            });
+        });
+    </script>
 
 
 </body>

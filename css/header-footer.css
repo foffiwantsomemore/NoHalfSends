@@ -6,31 +6,35 @@
 
 nav,
 .auth-action,
-.nhsicon-button {
+.nhsicon-button,
+.home-brand {
   position: fixed;
   top: 18px;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.02));
-  padding: 8px 14px;
-  min-height: 32px;
+  background:
+    linear-gradient(145deg, rgba(18, 34, 49, 0.86), rgba(8, 14, 24, 0.72)),
+    rgba(9, 18, 28, 0.74);
+  padding: 7px;
+  min-height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 12px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.45);
-  border: 1px solid rgba(255, 255, 255, 0.04);
-  backdrop-filter: blur(12px) saturate(1.05);
-  -webkit-backdrop-filter: blur(12px) saturate(1.05);
+  border-radius: 999px;
+  box-shadow: 0 14px 42px rgba(0, 0, 0, 0.36);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(18px) saturate(1.25);
+  -webkit-backdrop-filter: blur(18px) saturate(1.25);
 }
 
 nav {
   left: 50%;
   transform: translateX(-50%);
   z-index: 20;
+  max-width: calc(100vw - 170px);
 }
 
 nav ul {
   display: flex;
-  gap: 10px;
+  gap: 4px;
   align-items: center;
   justify-content: center;
   margin: 0;
@@ -48,22 +52,27 @@ nav a,
 .auth-action a {
   color: var(--fg-color);
   text-decoration: none;
-  padding: 6px 10px;
-  border-radius: 8px;
-  font-weight: 600;
-  font-size: 0.95rem;
-  transition: background 150ms ease, transform 150ms ease, text-shadow 150ms ease;
-  text-shadow: 0 0 1px transparent;
+  padding: 8px 13px;
+  border-radius: 999px;
+  font-weight: 750;
+  font-size: 0.92rem;
+  line-height: 1;
+  color: rgba(255, 255, 255, 0.74);
+  transition: background 150ms ease, transform 150ms ease, color 150ms ease, box-shadow 150ms ease;
 }
 
 nav a:hover {
-  background: rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.075);
   color: #ffffff;
-  text-shadow:
-    0 0 4px rgba(255, 255, 255, 0.7),
-    0 0 8px rgba(0, 174, 255, 0.7),
-    0 0 16px rgba(0, 174, 255, 0.7);
-  transform: translateY(-2px);
+  transform: translateY(-1px);
+}
+
+nav a.is-active {
+  background:
+    linear-gradient(145deg, rgba(0, 238, 255, 0.2), rgba(255, 255, 255, 0.09)),
+    rgba(255, 255, 255, 0.06);
+  color: #ffffff;
+  box-shadow: inset 0 0 0 1px rgba(0, 238, 255, 0.22), 0 8px 20px rgba(0, 238, 255, 0.1);
 }
 
 
@@ -71,7 +80,8 @@ nav a:hover {
 /* Auth button */
 
 .auth-action,
-.nhsicon-button {
+.nhsicon-button,
+.home-brand {
   position: fixed;
   top: 18px;
   z-index: 60;
@@ -85,34 +95,48 @@ nav a:hover {
   left: 20px;
 }
 
+.home-brand {
+  left: 20px;
+}
+
 .auth-action a,
-.nhsicon-button a {
+.nhsicon-button a,
+.home-brand a {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 20px;
-  height: 20px;
+  width: 34px;
+  height: 34px;
   padding: 0;
-  border-radius: 10px;
-  background: transparent;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.055);
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .auth-action a img,
-.nhsicon-button a img {
-  filter: brightness(2.5) saturate(1.8) hue-rotate(180deg);
-  transition: filter 150ms ease;
+.nhsicon-button a img,
+.home-brand a img {
+  width: 19px;
+  height: 19px;
+  object-fit: contain;
+  vertical-align: middle;
+  filter: brightness(2.3) saturate(1.6) hue-rotate(180deg);
+  transition: filter 150ms ease, transform 150ms ease;
 }
 
 .auth-action a:hover,
-.nhsicon-button a:hover {
-  background: transparent;
-  transform: none;
-  filter: brightness(2) drop-shadow(0 0 12px rgba(0, 174, 255, 0.9)) drop-shadow(0 0 20px rgba(0, 174, 255, 0.5));
+.nhsicon-button a:hover,
+.home-brand a:hover {
+  background: rgba(0, 238, 255, 0.11);
+  border-color: rgba(0, 238, 255, 0.28);
+  transform: translateY(-1px);
 }
 
 .auth-action a:hover img,
-.nhsicon-button a:hover img {
-  filter: brightness(3.5) saturate(2) hue-rotate(180deg) drop-shadow(0 0 8px rgba(0, 174, 255, 0.9));
+.nhsicon-button a:hover img,
+.home-brand a:hover img {
+  filter: brightness(3.1) saturate(1.9) hue-rotate(180deg) drop-shadow(0 0 8px rgba(0, 238, 255, 0.55));
+  transform: scale(1.04);
 }
 
 
@@ -135,35 +159,10 @@ body:not(.home-page)::before {
 html.home-page .auth-action {
   top: 20px;
   right: 20px;
-  height: 20px;
 }
 
 html.home-page .auth-action a {
-  width: 36px;
-  height: 36px;
-  padding: 6px 10px;
-  border-radius: 8px;
   color: #eaf6ff;
-  background: transparent;
-}
-
-html.home-page .auth-action a img {
-  filter: brightness(2.5) saturate(1.8) hue-rotate(180deg);
-  transition: filter 150ms ease;
-}
-
-html.home-page .auth-action a:hover {
-  background: transparent;
-  transform: none;
-  color: #ffffff;
-  text-shadow:
-    0 0 4px rgba(255, 255, 255, 0.7),
-    0 0 8px rgba(0, 174, 255, 0.7),
-    0 0 16px rgba(0, 174, 255, 0.7);
-}
-
-html.home-page .auth-action a:hover img {
-  filter: brightness(3.5) saturate(2) hue-rotate(180deg) drop-shadow(0 0 8px rgba(0, 174, 255, 0.9));
 }
 
 /* Home Navigation */
@@ -173,18 +172,14 @@ html.home-page .auth-action a:hover img {
   top: 20px;
   left: 50%;
   transform: translateX(-50%);
-  width: min(250px, calc(100% - 80px));
+  width: auto;
+  max-width: calc(100vw - 170px);
   z-index: 50;
-  border-radius: 14px;
-  min-height: 32px;
+  border-radius: 999px;
+  min-height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.02));
-  backdrop-filter: blur(12px) saturate(1.05);
-  -webkit-backdrop-filter: blur(12px) saturate(1.05);
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.45);
-  border: 1px solid rgba(255, 255, 255, 0.04);
   margin: 0 auto;
 }
 
@@ -200,7 +195,7 @@ html.home-page .auth-action a:hover img {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 12px;
+  gap: 4px;
   margin: 0;
   padding: 0;
   min-height: 100%;
@@ -221,20 +216,26 @@ html.home-page .auth-action a:hover img {
 .home-nav-links a {
   color: #eaf6ff;
   text-decoration: none;
-  padding: 6px 10px;
-  border-radius: 8px;
-  font-weight: 600;
-  transition: background 150ms ease, transform 120ms ease;
+  padding: 8px 13px;
+  border-radius: 999px;
+  font-weight: 750;
+  font-size: 0.92rem;
+  color: rgba(234, 246, 255, 0.74);
+  transition: background 150ms ease, transform 120ms ease, color 150ms ease, box-shadow 150ms ease;
 }
 
 .home-nav-links a:hover {
-  background: rgba(255, 255, 255, 0.04);
-  transform: translateY(-2px);
+  background: rgba(255, 255, 255, 0.075);
+  transform: translateY(-1px);
   color: #ffffff;
-  text-shadow:
-    0 0 4px rgba(255, 255, 255, 0.7),
-    0 0 8px rgba(0, 174, 255, 0.7),
-    0 0 16px rgba(0, 174, 255, 0.7);
+}
+
+.home-nav-links a.is-active {
+  background:
+    linear-gradient(145deg, rgba(0, 238, 255, 0.18), rgba(255, 255, 255, 0.08)),
+    rgba(255, 255, 255, 0.06);
+  color: #ffffff;
+  box-shadow: inset 0 0 0 1px rgba(0, 238, 255, 0.2), 0 8px 20px rgba(0, 238, 255, 0.09);
 }
 
 .home-center {
@@ -250,18 +251,18 @@ html.home-page .auth-action a:hover img {
 @media (max-width: 768px) {
   nav,
   .auth-action,
-  .nhsicon-button {
+  .nhsicon-button,
+  .home-brand {
     top: 12px;
-    padding: 6px 12px;
-    backdrop-filter: blur(12px) saturate(1.05);
-    -webkit-backdrop-filter: blur(12px) saturate(1.05);
+    backdrop-filter: blur(16px) saturate(1.15);
+    -webkit-backdrop-filter: blur(16px) saturate(1.15);
   }
   
   nav a,
   .auth-action a,
   .nhsicon-button a {
-    padding: 5px 8px;
-    font-size: 0.9rem;
+    padding: 7px 9px;
+    font-size: 0.86rem;
   }
   
   .nav-blur-overlay {
@@ -274,15 +275,41 @@ html.home-page .auth-action a:hover img {
   }
   
   .home-nav {
-    width: min(220px, calc(100% - 60px));
+    max-width: calc(100% - 108px);
     top: 12px;
-    backdrop-filter: blur(12px) saturate(1.05);
-    -webkit-backdrop-filter: blur(12px) saturate(1.05);
   }
   
   .home-nav-links a {
-    padding: 5px 8px;
-    font-size: 0.9rem;
+    padding: 7px 9px;
+    font-size: 0.86rem;
   }
   
+}
+
+@media (max-width: 520px) {
+  nav,
+  .home-nav {
+    max-width: calc(100% - 96px);
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  nav::-webkit-scrollbar,
+  .home-nav::-webkit-scrollbar {
+    display: none;
+  }
+
+  nav ul,
+  .home-nav-links {
+    justify-content: flex-start;
+  }
+
+  .auth-action {
+    right: 10px;
+  }
+
+  .nhsicon-button,
+  .home-brand {
+    left: 10px;
+  }
 }

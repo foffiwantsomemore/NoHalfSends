@@ -31,12 +31,19 @@ $sqlFeed = "
         a.activityid, a.userid,
         u.username, u.name AS user_name, u.surname AS user_surname, u.userimage,
         s.name AS sport_name, s.sportimage,
-        a.name AS activity_name, a.activitydate, a.duration, a.description,
-        r.distance AS r_distance, r.pace AS r_pace,
+        a.name AS activity_name, a.activitydate, a.duration, a.avgheartrate, a.maxheartrate, a.calories, a.description,
+        r.distance AS r_distance, r.pace AS r_pace, r.cadence AS r_cadence,
         c.distance AS c_distance, c.elevation AS c_elevation,
+        c.type AS c_type, c.avgpower AS c_avgpower, c.maxpower AS c_maxpower,
+        c.cadence AS c_cadence, c.avgspeed AS c_avgspeed, c.maxspeed AS c_maxspeed,
         e.distance AS e_distance, e.elevation AS e_elevation,
-        sk.distance AS sk_distance, sk.elevation AS sk_elevation,
-        sw.distance AS sw_distance, sw.pace AS sw_pace,
+        e.pace AS e_pace,
+        g.type AS g_type,
+        sk.distance AS sk_distance, sk.elevation AS sk_elevation, sk.avgspeed AS sk_avgspeed,
+        t.pace AS t_pace,
+        cc.pace AS cc_pace, cc.technique AS cc_technique,
+        al.descentsnr AS al_descentsnr, al.maxspeed AS al_maxspeed,
+        sw.distance AS sw_distance, sw.pace AS sw_pace, sw.type AS sw_type,
         (SELECT COUNT(*) FROM ActivityLike al WHERE al.activityid = a.activityid) AS like_count,
         (SELECT COUNT(*) FROM ActivityLike al WHERE al.activityid = a.activityid AND al.userid = :userIdLike) AS user_liked,
         (SELECT COUNT(*) FROM ActivityComment ac WHERE ac.activityid = a.activityid) AS comment_count
@@ -46,7 +53,11 @@ $sqlFeed = "
     LEFT JOIN Run r ON a.activityid = r.activityid
     LEFT JOIN Cycling c ON a.activityid = c.activityid
     LEFT JOIN Excursion e ON a.activityid = e.activityid
+    LEFT JOIN Gym g ON a.activityid = g.activityid
     LEFT JOIN Ski sk ON a.activityid = sk.activityid
+    LEFT JOIN Touring t ON a.activityid = t.activityid
+    LEFT JOIN CrossCountry cc ON a.activityid = cc.activityid
+    LEFT JOIN Alpine al ON a.activityid = al.activityid
     LEFT JOIN Swimming sw ON a.activityid = sw.activityid
     WHERE a.userid = :userId
        OR a.userid IN (SELECT followedid FROM Follow WHERE followerid = :userId2)
@@ -118,8 +129,11 @@ $formatDuration = function($minutes) {
 <div class="feed-container">
     <main class="feed-main">
         <div class="feed-header">
-            <h2>Your Feed</h2>
-            <a href="newactivity.php" class="btn">+ New Activity</a>
+            <div>
+                <span class="feed-eyebrow">Community pulse</span>
+                <h2>Your Feed</h2>
+            </div>
+            <a href="newactivity.php" class="btn feed-new-activity">+ New Activity</a>
         </div>
 
         <?php if (empty($feedActivities)): ?>
@@ -132,9 +146,44 @@ $formatDuration = function($minutes) {
                 $photos = $photosByActivity[$aid] ?? [];
                 $comments = $commentsByActivity[$aid] ?? [];
                 $userImg = !empty($act['userimage']) ? htmlspecialchars($act['userimage']) : '../media/default-user.png';
-                $dist = $act['r_distance'] ?? $act['c_distance'] ?? $act['e_distance'] ?? $act['sk_distance'] ?? null;
-                $elev = $act['c_elevation'] ?? $act['e_elevation'] ?? $act['sk_elevation'] ?? null;
-                $pace = $act['r_pace'] ?? $act['sw_pace'] ?? null;
+                $activityStats = [];
+                $activityStats[] = ['label' => 'Duration', 'value' => $formatDuration((int)$act['duration'])];
+
+                $addStat = function($label, $value) use (&$activityStats) {
+                    if ($value !== null && $value !== '') {
+                        $activityStats[] = ['label' => $label, 'value' => $value];
+                    }
+                };
+
+                $distance = $act['r_distance'] ?? $act['c_distance'] ?? $act['e_distance'] ?? $act['sk_distance'] ?? null;
+                if ($distance !== null) {
+                    $addStat('Distance', number_format((float)$distance, 2) . ' km');
+                }
+                if ($act['sw_distance'] !== null) {
+                    $addStat('Distance', (int)$act['sw_distance'] . ' m');
+                }
+
+                $elevation = $act['c_elevation'] ?? $act['e_elevation'] ?? $act['sk_elevation'] ?? null;
+                $pace = $act['r_pace'] ?? $act['e_pace'] ?? $act['t_pace'] ?? $act['cc_pace'] ?? $act['sw_pace'] ?? null;
+                $avgSpeed = $act['c_avgspeed'] ?? $act['sk_avgspeed'] ?? null;
+                $maxSpeed = $act['c_maxspeed'] ?? $act['al_maxspeed'] ?? null;
+                $cadence = $act['r_cadence'] ?? $act['c_cadence'] ?? null;
+
+                if ($elevation !== null) $addStat('Elevation', (int)$elevation . ' m');
+                if ($pace !== null) $addStat('Pace', number_format((float)$pace, 2) . '/km');
+                if ($avgSpeed !== null) $addStat('Avg Speed', number_format((float)$avgSpeed, 1) . ' km/h');
+                if ($maxSpeed !== null) $addStat('Max Speed', number_format((float)$maxSpeed, 1) . ' km/h');
+                if ($cadence !== null) $addStat('Cadence', (int)$cadence . ' spm');
+                if ($act['c_avgpower'] !== null) $addStat('Avg Power', (int)$act['c_avgpower'] . ' W');
+                if ($act['c_maxpower'] !== null) $addStat('Max Power', (int)$act['c_maxpower'] . ' W');
+                if ($act['avgheartrate'] !== null) $addStat('Avg HR', (int)$act['avgheartrate'] . ' bpm');
+                if ($act['maxheartrate'] !== null) $addStat('Max HR', (int)$act['maxheartrate'] . ' bpm');
+                if ($act['calories'] !== null) $addStat('Calories', (int)$act['calories'] . ' kcal');
+                if ($act['c_type'] !== null) $addStat('Type', ucfirst($act['c_type']));
+                if ($act['g_type'] !== null) $addStat('Type', ucfirst($act['g_type']));
+                if ($act['sw_type'] !== null) $addStat('Type', ucfirst($act['sw_type']));
+                if ($act['cc_technique'] !== null) $addStat('Technique', ucfirst($act['cc_technique']));
+                if ($act['al_descentsnr'] !== null) $addStat('Descents', (int)$act['al_descentsnr']);
             ?>
             <article class="activity-card" id="card-<?= $aid ?>">
 
@@ -147,58 +196,45 @@ $formatDuration = function($minutes) {
                             <span>@<?= htmlspecialchars($act['username']) ?> · <?= (new DateTime($act['activitydate']))->format('d M Y, H:i') ?></span>
                         </div>
                     </a>
-                    <?php if (!empty($act['sportimage'])): ?>
-                        <img src="../<?= htmlspecialchars($act['sportimage']) ?>" alt="<?= htmlspecialchars($act['sport_name']) ?>" class="activity-sport-icon" title="<?= htmlspecialchars($act['sport_name']) ?>">
-                    <?php endif; ?>
+                    <div class="activity-card-tools">
+                        <?php if ($isOwner): ?>
+                            <a href="editactivity.php?id=<?= $aid ?>" class="activity-edit-btn" title="Edit activity">Edit</a>
+                        <?php endif; ?>
+                        <?php if (!empty($act['sportimage'])): ?>
+                            <img src="../<?= htmlspecialchars($act['sportimage']) ?>" alt="<?= htmlspecialchars($act['sport_name']) ?>" class="activity-sport-icon" title="<?= htmlspecialchars($act['sport_name']) ?>">
+                        <?php endif; ?>
+                    </div>
                 </div>
 
                 <!-- Body -->
                 <div class="activity-card-body">
-                    <h3 class="activity-title"><?= htmlspecialchars($act['activity_name'] ?: $act['sport_name']) ?></h3>
-                    <?php if (!empty($act['description'])): ?>
-                        <p class="activity-description"><?= nl2br(htmlspecialchars($act['description'])) ?></p>
-                    <?php endif; ?>
+                    <div class="activity-content">
+                        <div class="activity-details">
+                            <h3 class="activity-title"><?= htmlspecialchars($act['activity_name'] ?: $act['sport_name']) ?></h3>
+                            <?php if (!empty($act['description'])): ?>
+                                <p class="activity-description"><?= nl2br(htmlspecialchars($act['description'])) ?></p>
+                            <?php endif; ?>
 
-                    <!-- Stats chips -->
-                    <div class="activity-stats">
-                        <div class="stat-chip">
-                            <span class="stat-val"><?= $formatDuration($act['duration']) ?></span>
-                            <span class="stat-lbl">Duration</span>
+                            <!-- Stats chips -->
+                            <div class="activity-stats">
+                                <?php foreach ($activityStats as $index => $stat): ?>
+                                <div class="stat-chip <?= $index < 3 ? 'stat-chip-primary' : 'stat-chip-secondary' ?>">
+                                    <span class="stat-val"><?= htmlspecialchars((string)$stat['value']) ?></span>
+                                    <span class="stat-lbl"><?= htmlspecialchars($stat['label']) ?></span>
+                                </div>
+                                <?php endforeach; ?>
+                            </div>
                         </div>
-                        <?php if ($dist !== null): ?>
-                        <div class="stat-chip">
-                            <span class="stat-val"><?= number_format((float)$dist, 2) ?> km</span>
-                            <span class="stat-lbl">Distance</span>
-                        </div>
-                        <?php endif; ?>
-                        <?php if (isset($act['sw_distance']) && $act['sw_distance'] !== null): ?>
-                        <div class="stat-chip">
-                            <span class="stat-val"><?= (int)$act['sw_distance'] ?> m</span>
-                            <span class="stat-lbl">Distance</span>
-                        </div>
-                        <?php endif; ?>
-                        <?php if ($elev !== null): ?>
-                        <div class="stat-chip">
-                            <span class="stat-val"><?= (int)$elev ?> m</span>
-                            <span class="stat-lbl">Elevation</span>
-                        </div>
-                        <?php endif; ?>
-                        <?php if ($pace !== null): ?>
-                        <div class="stat-chip">
-                            <span class="stat-val"><?= number_format((float)$pace, 2) ?>/km</span>
-                            <span class="stat-lbl">Pace</span>
+
+                        <!-- Photos -->
+                        <?php if (!empty($photos)): ?>
+                        <div class="activity-photos">
+                            <?php foreach ($photos as $photoUrl): ?>
+                                <img src="<?= htmlspecialchars($photoUrl) ?>" class="activity-photo" alt="Activity photo">
+                            <?php endforeach; ?>
                         </div>
                         <?php endif; ?>
                     </div>
-
-                    <!-- Photos -->
-                    <?php if (!empty($photos)): ?>
-                    <div class="activity-photos">
-                        <?php foreach ($photos as $photoUrl): ?>
-                            <img src="<?= htmlspecialchars($photoUrl) ?>" class="activity-photo" alt="Activity photo">
-                        <?php endforeach; ?>
-                    </div>
-                    <?php endif; ?>
                 </div>
 
                 <!-- Actions bar -->
@@ -215,9 +251,6 @@ $formatDuration = function($minutes) {
                         Comment <span><?= (int)$act['comment_count'] ?></span>
                     </button>
 
-                    <?php if ($isOwner): ?>
-                    <a href="editactivity.php?id=<?= $aid ?>" class="action-btn" title="Edit activity" style="text-decoration:none;">Edit</a>
-                    <?php endif; ?>
                 </div>
 
                 <!-- Comments section (hidden by default) -->
@@ -250,20 +283,33 @@ $formatDuration = function($minutes) {
 
     <aside class="feed-sidebar">
         <div class="recommended-box">
-            <h3>Suggested Athletes</h3>
+            <div class="recommended-heading">
+                <span>Discover</span>
+                <h3>Suggested Athletes</h3>
+            </div>
             <?php if (empty($recommendedUsers)): ?>
-                <p style="font-size:0.85rem;opacity:0.6;">No suggestions available.</p>
+                <p class="recommended-empty">No suggestions available.</p>
             <?php else: ?>
                 <?php foreach ($recommendedUsers as $ru):
                     $ruImg = !empty($ru['userimage']) ? htmlspecialchars($ru['userimage']) : '../media/default-user.png';
                 ?>
-                <div class="rec-user" onclick="window.location.href='profile.php?id=<?= (int)$ru['userid'] ?>'">
-                    <img src="<?= $ruImg ?>" alt="User">
-                    <div class="rec-user-info">
-                        <strong><?= htmlspecialchars($ru['name'] . ' ' . $ru['surname']) ?></strong>
-                        <span>@<?= htmlspecialchars($ru['username']) ?></span>
-                    </div>
-                </div>
+                <article class="rec-user">
+                    <a class="rec-user-profile" href="profile.php?id=<?= (int)$ru['userid'] ?>">
+                        <span class="rec-avatar-wrap">
+                            <img src="<?= $ruImg ?>" alt="User">
+                        </span>
+                        <span class="rec-user-info">
+                            <strong><?= htmlspecialchars($ru['name'] . ' ' . $ru['surname']) ?></strong>
+                            <span>@<?= htmlspecialchars($ru['username']) ?></span>
+                            <small><?= (int)$ru['followers'] ?> followers</small>
+                        </span>
+                    </a>
+                    <form method="post" action="feed.php" class="rec-follow-form">
+                        <input type="hidden" name="action" value="follow">
+                        <input type="hidden" name="target_id" value="<?= (int)$ru['userid'] ?>">
+                        <button type="submit" class="rec-follow-btn" aria-label="Follow <?= htmlspecialchars($ru['username']) ?>">Follow</button>
+                    </form>
+                </article>
                 <?php endforeach; ?>
             <?php endif; ?>
         </div>

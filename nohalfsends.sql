@@ -337,77 +337,28 @@ SELECT
 FROM Club c
 LEFT JOIN Sport s ON s.sportid = c.sportid;
 
---club members with their roles
-CREATE VIEW v_club_members AS
+--user followers
+CREATE OR REPLACE VIEW v_user_followers AS
 SELECT
-    uc.clubid,
-    uc.userid,
-    u.username,
+    f.followedid AS userid,
+    f.followerid,
+    f.followdate,
     u.name,
     u.surname,
-    u.userimage,
-    uc.joindate,
-    uc.admin,
-    CASE 
-        WHEN uc.admin = 1 THEN 'admin'
-        ELSE 'member'
-    END AS role
-FROM UserClub uc
-INNER JOIN User u ON u.userid = uc.userid
-ORDER BY uc.admin DESC, uc.joindate ASC;
+    u.username,
+    u.userimage
+FROM Follow f
+INNER JOIN User u ON u.userid = f.followerid;
 
---user club role check
-CREATE VIEW v_user_club_role AS
+--user following
+CREATE OR REPLACE VIEW v_user_following AS
 SELECT
-    uc.userid,
-    uc.clubid,
-    uc.joindate,
-    uc.admin,
-    c.name AS club_name,
-    CASE 
-        WHEN uc.admin = 1 THEN 'admin'
-        ELSE 'member'
-    END AS role
-FROM UserClub uc
-INNER JOIN Club c ON c.clubid = uc.clubid;
-
---club statistics summary
-CREATE VIEW v_club_stats AS
-SELECT
-    c.clubid,
-    c.name,
-    COUNT(DISTINCT uc.userid) AS total_members,
-    COUNT(DISTINCT a.activityid) AS total_activities,
-    COUNT(DISTINCT CASE WHEN uc.admin = 1 THEN uc.userid END) AS admin_count,
-    MAX(a.activitydate) AS last_activity_date
-FROM Club c
-LEFT JOIN UserClub uc ON uc.clubid = c.clubid
-LEFT JOIN Activity a ON a.userid = uc.userid
-GROUP BY c.clubid, c.name;
-
-
-/* Stored Procedures */ 
-DELIMITER $$
-
-CREATE PROCEDURE sp_update_user_profile (
-    IN p_userid INT,
-    IN p_name VARCHAR(50),
-    IN p_surname VARCHAR(50),
-    IN p_description TEXT,
-    IN p_userimage VARCHAR(255),
-    IN p_weight DECIMAL(5,2),
-    IN p_address VARCHAR(255)
-)
-BEGIN
-    UPDATE User
-    SET
-        name = p_name,
-        surname = p_surname,
-        description = p_description,
-        userimage = p_userimage,
-        weight = p_weight,
-        address = p_address
-    WHERE userid = p_userid;
-END$$
-
-DELIMITER ;
+    f.followerid AS userid,
+    f.followedid,
+    f.followdate,
+    u.name,
+    u.surname,
+    u.username,
+    u.userimage
+FROM Follow f
+INNER JOIN User u ON u.userid = f.followedid;

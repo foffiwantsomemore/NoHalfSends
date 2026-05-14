@@ -15,7 +15,7 @@ $isOwnProfile = ($loggedInUserId === $userId);
 $isFollowing = false;
 
 if (!$isOwnProfile && $loggedInUserId && $userId) {
-    $sqlCheck = "SELECT 1 FROM Follow WHERE followerid = :fid AND followedid = :uid";
+    $sqlCheck = "SELECT 1 FROM v_user_following WHERE userid = :fid AND followedid = :uid";
     $sthCheck = $pdo->prepare($sqlCheck);
     $sthCheck->execute([':fid' => $loggedInUserId, ':uid' => $userId]);
     $isFollowing = (bool)$sthCheck->fetch();
@@ -39,8 +39,8 @@ if (!$user) {
 // followers count
 $sqlFollowers = "
     SELECT COUNT(*) AS follower_count
-    FROM Follow
-    WHERE followedid = :uid
+    FROM v_user_followers
+    WHERE userid = :uid
 ";
 $sthFollowers = $pdo->prepare($sqlFollowers);
 $sthFollowers->bindValue(':uid', $userId, PDO::PARAM_INT);
@@ -50,13 +50,35 @@ $followerCount = $sthFollowers->fetch()['follower_count'] ?? 0;
 // following count
 $sqlFollowing = "
     SELECT COUNT(*) AS following_count
-    FROM Follow
-    WHERE followerid = :uid
+    FROM v_user_following
+    WHERE userid = :uid
 ";
 $sthFollowing = $pdo->prepare($sqlFollowing);
 $sthFollowing->bindValue(':uid', $userId, PDO::PARAM_INT);
 $sthFollowing->execute();
 $followingCount = $sthFollowing->fetch()['following_count'] ?? 0;
+
+$sqlFollowerUsers = "
+    SELECT followerid AS userid, name, surname, username, userimage
+    FROM v_user_followers
+    WHERE userid = :uid
+    ORDER BY followdate DESC, username ASC
+";
+$sthFollowerUsers = $pdo->prepare($sqlFollowerUsers);
+$sthFollowerUsers->bindValue(':uid', $userId, PDO::PARAM_INT);
+$sthFollowerUsers->execute();
+$followerUsers = $sthFollowerUsers->fetchAll();
+
+$sqlFollowingUsers = "
+    SELECT followedid AS userid, name, surname, username, userimage
+    FROM v_user_following
+    WHERE userid = :uid
+    ORDER BY followdate DESC, username ASC
+";
+$sthFollowingUsers = $pdo->prepare($sqlFollowingUsers);
+$sthFollowingUsers->bindValue(':uid', $userId, PDO::PARAM_INT);
+$sthFollowingUsers->execute();
+$followingUsers = $sthFollowingUsers->fetchAll();
 
 
 //sports practiced
@@ -192,6 +214,7 @@ for ($i = 6; $i >= 0; $i--) {
     <link rel="stylesheet" href="../css/header-footer.css">
 </head>
 <body>
+<?php include __DIR__ . '/../include/menu/menuChoice.php'; ?>
 
 <div class="profile-page">
 
@@ -254,12 +277,78 @@ for ($i = 6; $i >= 0; $i--) {
 
         <div class="community-stats">
             <div class="community-card">
-                <div class="community-value"><?php echo htmlspecialchars($followerCount, ENT_QUOTES); ?></div>
-                <div class="community-label">Followers</div>
+                <details class="community-people">
+                    <summary>
+                        <span>
+                            <span class="community-value"><?php echo htmlspecialchars($followerCount, ENT_QUOTES); ?></span>
+                            <span class="community-label">Followers</span>
+                        </span>
+                        <span class="community-open-icon" aria-hidden="true"></span>
+                    </summary>
+
+                    <div class="community-people-list">
+                        <?php if (count($followerUsers) === 0): ?>
+                            <p class="community-empty">No followers yet.</p>
+                        <?php else: ?>
+                            <?php foreach ($followerUsers as $person): ?>
+                                <a class="community-person" href="profile.php?id=<?php echo (int)$person['userid']; ?>">
+                                    <span class="community-person-avatar">
+                                        <?php if (!empty($person['userimage'])): ?>
+                                            <img src="<?php echo htmlspecialchars($person['userimage'], ENT_QUOTES); ?>" alt="">
+                                        <?php else: ?>
+                                            <img src="../media/default-user.png" alt="">
+                                        <?php endif; ?>
+                                    </span>
+                                    <span class="community-person-info">
+                                        <span class="community-person-name">
+                                            <?php echo htmlspecialchars(trim($person['name'] . ' ' . $person['surname']), ENT_QUOTES); ?>
+                                        </span>
+                                        <?php if (!empty($person['username'])): ?>
+                                            <span class="community-person-username">@<?php echo htmlspecialchars($person['username'], ENT_QUOTES); ?></span>
+                                        <?php endif; ?>
+                                    </span>
+                                </a>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </div>
+                </details>
             </div>
             <div class="community-card">
-                <div class="community-value"><?php echo htmlspecialchars($followingCount, ENT_QUOTES); ?></div>
-                <div class="community-label">Following</div>
+                <details class="community-people">
+                    <summary>
+                        <span>
+                            <span class="community-value"><?php echo htmlspecialchars($followingCount, ENT_QUOTES); ?></span>
+                            <span class="community-label">Following</span>
+                        </span>
+                        <span class="community-open-icon" aria-hidden="true"></span>
+                    </summary>
+
+                    <div class="community-people-list">
+                        <?php if (count($followingUsers) === 0): ?>
+                            <p class="community-empty">Not following anyone yet.</p>
+                        <?php else: ?>
+                            <?php foreach ($followingUsers as $person): ?>
+                                <a class="community-person" href="profile.php?id=<?php echo (int)$person['userid']; ?>">
+                                    <span class="community-person-avatar">
+                                        <?php if (!empty($person['userimage'])): ?>
+                                            <img src="<?php echo htmlspecialchars($person['userimage'], ENT_QUOTES); ?>" alt="">
+                                        <?php else: ?>
+                                            <img src="../media/default-user.png" alt="">
+                                        <?php endif; ?>
+                                    </span>
+                                    <span class="community-person-info">
+                                        <span class="community-person-name">
+                                            <?php echo htmlspecialchars(trim($person['name'] . ' ' . $person['surname']), ENT_QUOTES); ?>
+                                        </span>
+                                        <?php if (!empty($person['username'])): ?>
+                                            <span class="community-person-username">@<?php echo htmlspecialchars($person['username'], ENT_QUOTES); ?></span>
+                                        <?php endif; ?>
+                                    </span>
+                                </a>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </div>
+                </details>
             </div>
         </div>
     </section>
@@ -278,7 +367,7 @@ for ($i = 6; $i >= 0; $i--) {
             <div class="manage-sports-content">
                 <div class="manage-sports-title">
                     <h3>Choose your sports</h3>
-                    <button type="button" class="manage-sports-close" id="close-manage-sports">×</button>
+                    <button type="button" class="manage-sports-close" id="close-manage-sports">Close</button>
                 </div>
                 <p class="manage-sports-hint">Select the sports you practice. They will appear in your profile.</p>
 

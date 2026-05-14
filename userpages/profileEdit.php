@@ -72,8 +72,11 @@ if (!$user) {
 <?php include __DIR__ . '/../include/menu/menuChoice.php'; ?>
 
 <div class="profile-page">
-    <section class="profile-section">
-        <h2 class="section-title">Edit profile</h2>
+    <section class="profile-section profile-edit-shell">
+        <div class="edit-page-heading">
+            <span class="edit-page-eyebrow">Account settings</span>
+            <h2 class="section-title">Edit profile</h2>
+        </div>
 
         <?php if ($errorMessage): ?>
             <div class="error-message"><?php echo htmlspecialchars($errorMessage, ENT_QUOTES); ?></div>
@@ -93,19 +96,19 @@ if (!$user) {
                     <?php endif; ?>
                 </div>
 
-                            <div class="profile-image-actions">
+            <div class="profile-image-actions">
                 <form action="uploadProfileImage.php" method="post" enctype="multipart/form-data" class="profile-image-form">
-                    <label for="userimage">Cambia immagine profilo:</label>
+                    <label for="userimage">Profile image</label>
                     <input type="file" name="userimage" id="userimage" accept="image/*" required>
                     <div class="profile-image-buttons-wrapper">
-                        <button type="submit" class="btn">Carica</button>
+                        <button type="submit" class="btn">Upload</button>
                     </div>
                 </form>
 
                 <?php if (!empty($user['userimage'])): ?>
                     <form action="uploadProfileImage.php" method="post" class="profile-image-form">
                         <input type="hidden" name="remove_profile" value="1">
-                        <button type="submit" class="btn">Rimuovi immagine profilo</button>
+                        <button type="submit" class="btn btn-secondary">Remove image</button>
                     </form>
                 <?php endif; ?>
             </div>
@@ -115,12 +118,12 @@ if (!$user) {
             <!--dati profilo base-->
             <form action="profileEdit.php" method="post" class="profile-edit-form">
             <div class="form-row">
-                <label for="name">Nome</label>
+                <label for="name">Name</label>
                 <input type="text" id="name" name="name" value="<?php echo htmlspecialchars($user['name'] ?? '', ENT_QUOTES); ?>" required>
             </div>
 
             <div class="form-row">
-                <label for="surname">Cognome</label>
+                <label for="surname">Surname</label>
                 <input type="text" id="surname" name="surname" value="<?php echo htmlspecialchars($user['surname'] ?? '', ENT_QUOTES); ?>" required>
             </div>
 
@@ -135,18 +138,18 @@ if (!$user) {
             </div>
 
             <div class="form-row">
-                <label for="description">Descrizione</label>
+                <label for="description">Description</label>
                 <textarea id="description" name="description" rows="4"><?php echo htmlspecialchars($user['description'] ?? '', ENT_QUOTES); ?></textarea>
             </div>
 
-            <button type="submit" class="btn">Salva modifiche</button>
+            <button type="submit" class="btn">Save changes</button>
             </form>
 
         </div>
 
-        <p style="margin-top: 1rem;">
-            <a href="profile.php" class="btn">Torna al profilo</a>
-        </p>
+        <div class="edit-bottom-actions">
+            <a href="profile.php" class="btn btn-secondary">Back to profile</a>
+        </div>
     </section>
 </div>
 

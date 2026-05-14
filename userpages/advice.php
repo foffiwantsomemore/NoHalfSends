@@ -53,6 +53,51 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             header('Location: advice.php');
             exit;
+        } elseif ($action === 'update_advice' && $isAdmin) {
+            $adviceId = (int)($_POST['adviceid'] ?? 0);
+            $title = trim($_POST['title'] ?? '');
+            $content = trim($_POST['content'] ?? '');
+            $category = $_POST['category'] ?? '';
+            $allowedCategories = ['nutrition', 'training', 'recovery'];
+
+            if ($adviceId > 0 && $title !== '' && $content !== '' && in_array($category, $allowedCategories, true)) {
+                $stmt = $pdo->prepare("UPDATE Advice SET title = ?, content = ?, category = ? WHERE adviceid = ?");
+                $stmt->execute([$title, $content, $category, $adviceId]);
+
+                if (isset($_FILES['photo']) && $_FILES['photo']['error'] === UPLOAD_ERR_OK) {
+                    $file = $_FILES['photo'];
+                    $allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+                    if (in_array($file['type'], $allowedTypes, true) && $file['size'] <= 5 * 1024 * 1024) {
+                        $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+                        $uploadDir = __DIR__ . '/../images/advice/';
+                        if (!is_dir($uploadDir)) {
+                            mkdir($uploadDir, 0777, true);
+                        }
+                        $filename = 'advice_' . $adviceId . '_' . time() . '.' . $ext;
+                        $destPath = $uploadDir . $filename;
+                        if (move_uploaded_file($file['tmp_name'], $destPath)) {
+                            $stmtPhoto = $pdo->prepare("SELECT advicephotoid, url FROM AdvicePhoto WHERE adviceid = ? LIMIT 1");
+                            $stmtPhoto->execute([$adviceId]);
+                            $existingPhoto = $stmtPhoto->fetch();
+                            $relativePath = '../images/advice/' . $filename;
+
+                            if ($existingPhoto) {
+                                $oldPath = __DIR__ . '/../' . ltrim(str_replace('../', '', $existingPhoto['url']), '/');
+                                if (is_file($oldPath)) {
+                                    unlink($oldPath);
+                                }
+                                $stmt = $pdo->prepare("UPDATE AdvicePhoto SET url = ? WHERE advicephotoid = ?");
+                                $stmt->execute([$relativePath, (int)$existingPhoto['advicephotoid']]);
+                            } else {
+                                $stmt = $pdo->prepare("INSERT INTO AdvicePhoto (adviceid, url) VALUES (?, ?)");
+                                $stmt->execute([$adviceId, $relativePath]);
+                            }
+                        }
+                    }
+                }
+            }
+            header('Location: advice.php');
+            exit;
         } elseif ($action === 'like') {
             $adviceId = (int)$_POST['adviceid'];
             $stmt = $pdo->prepare("SELECT 1 FROM AdviceLike WHERE userid = ? AND adviceid = ?");
@@ -107,7 +152,10 @@ $advices = $stmt->fetchAll();
 
 <div class="advice-container">
     <div class="advice-page-header">
-        <h2>Advice &amp; News</h2>
+        <div>
+            <span class="advice-eyebrow">Coach notes</span>
+            <h2>Advice &amp; News</h2>
+        </div>
         <?php if ($isAdmin): ?>
             <button class="btn" onclick="toggleAdminForm()" id="admin-toggle-btn">+ New Advice</button>
         <?php endif; ?>
@@ -122,9 +170,9 @@ $advices = $stmt->fetchAll();
                 <input type="text" name="title" required placeholder="Advice title...">
                 <label>Category</label>
                 <select name="category" required>
-                    <option value="nutrition">🥗 Nutrition</option>
-                    <option value="training">🏋️ Training</option>
-                    <option value="recovery">💤 Recovery</option>
+                    <option value="nutrition">Nutrition</option>
+                    <option value="training">Training</option>
+                    <option value="recovery">Recovery</option>
                 </select>
                 <label>Content</label>
                 <textarea name="content" rows="5" required placeholder="Write your advice..."></textarea>
@@ -136,10 +184,10 @@ $advices = $stmt->fetchAll();
     <?php endif; ?>
 
     <?php if (empty($advices)): ?>
-        <p style="color: var(--color-text-muted, rgba(255,255,255,0.6));">No advice or news published yet.</p>
+        <p class="advice-empty">No advice or news published yet.</p>
     <?php else: ?>
         <?php foreach ($advices as $adv): ?>
-            <div class="advice-card">
+            <article class="advice-card">
                 <div class="advice-header">
                     <?php $uImg = !empty($adv['author_image']) ? htmlspecialchars($adv['author_image']) : '../media/default-user.png'; ?>
                     <img src="<?php echo $uImg; ?>" class="advice-author-img" alt="Author">
@@ -150,55 +198,102 @@ $advices = $stmt->fetchAll();
                     <div class="advice-category"><?php echo htmlspecialchars($adv['category']); ?></div>
                 </div>
 
-                <h3 class="advice-title"><?php echo htmlspecialchars($adv['title']); ?></h3>
-                
-                <div class="advice-content">
-                    <?php echo nl2br(htmlspecialchars($adv['content'])); ?>
-                </div>
+                <div class="advice-card-main <?= !empty($adv['photo_url']) ? 'has-photo' : 'no-photo' ?>">
+                    <div class="advice-copy">
+                        <h3 class="advice-title"><?php echo htmlspecialchars($adv['title']); ?></h3>
+                        
+                        <div class="advice-content">
+                            <?php echo nl2br(htmlspecialchars($adv['content'])); ?>
+                        </div>
+                    </div>
 
-                <?php if (!empty($adv['photo_url'])): ?>
-                    <img src="<?php echo htmlspecialchars($adv['photo_url']); ?>" class="advice-photo" alt="Advice Photo">
-                <?php endif; ?>
+                    <?php if (!empty($adv['photo_url'])): ?>
+                        <img src="<?php echo htmlspecialchars($adv['photo_url']); ?>" class="advice-photo" alt="Advice Photo">
+                    <?php endif; ?>
+                </div>
 
                 <div class="advice-actions">
                     <form method="post">
                         <input type="hidden" name="action" value="like">
                         <input type="hidden" name="adviceid" value="<?php echo $adv['adviceid']; ?>">
                         <button type="submit" class="action-btn <?php echo $adv['is_liked'] ? 'liked' : ''; ?>">
-                            ♥ <?php echo $adv['like_count']; ?> Likes
+                            <span class="advice-action-icon" aria-hidden="true">&hearts;</span>
+                            <?php echo $adv['like_count']; ?> Likes
                         </button>
                     </form>
                     
                     <?php
-                        $stmt = $pdo->prepare("SELECT c.*, u.name, u.surname FROM AdviceComment c JOIN User u ON c.userid = u.userid WHERE c.adviceid = ? ORDER BY c.commentdate ASC");
+                        $stmt = $pdo->prepare("SELECT c.*, u.name, u.surname, u.username, u.userimage FROM AdviceComment c JOIN User u ON c.userid = u.userid WHERE c.adviceid = ? ORDER BY c.commentdate ASC");
                         $stmt->execute([$adv['adviceid']]);
                         $comments = $stmt->fetchAll();
                     ?>
                     
                     <button type="button" class="action-btn" onclick="toggleComments('comments-<?php echo $adv['adviceid']; ?>')">
-                        💬 <?php echo count($comments); ?> Comments
+                        <span class="advice-action-icon advice-comment-icon" aria-hidden="true"></span>
+                        <?php echo count($comments); ?> Comments
                     </button>
+
+                    <?php if ($isAdmin): ?>
+                        <button type="button" class="action-btn advice-edit-toggle" onclick="toggleAdviceEdit('edit-advice-<?php echo $adv['adviceid']; ?>')">
+                            Edit
+                        </button>
+                    <?php endif; ?>
                 </div>
 
+                <?php if ($isAdmin): ?>
+                    <div class="advice-edit-panel" id="edit-advice-<?php echo $adv['adviceid']; ?>">
+                        <h4>Edit advice</h4>
+                        <form method="post" enctype="multipart/form-data" class="advice-admin-form advice-inline-edit-form">
+                            <input type="hidden" name="action" value="update_advice">
+                            <input type="hidden" name="adviceid" value="<?php echo (int)$adv['adviceid']; ?>">
+
+                            <label>Title</label>
+                            <input type="text" name="title" required value="<?php echo htmlspecialchars($adv['title'], ENT_QUOTES); ?>">
+
+                            <label>Category</label>
+                            <select name="category" required>
+                                <option value="nutrition" <?php echo $adv['category'] === 'nutrition' ? 'selected' : ''; ?>>Nutrition</option>
+                                <option value="training" <?php echo $adv['category'] === 'training' ? 'selected' : ''; ?>>Training</option>
+                                <option value="recovery" <?php echo $adv['category'] === 'recovery' ? 'selected' : ''; ?>>Recovery</option>
+                            </select>
+
+                            <label>Content</label>
+                            <textarea name="content" rows="5" required><?php echo htmlspecialchars($adv['content'], ENT_QUOTES); ?></textarea>
+
+                            <label>Replace photo (optional)</label>
+                            <input type="file" name="photo" accept="image/*">
+
+                            <div class="advice-edit-actions">
+                                <button type="submit" class="btn">Save changes</button>
+                                <button type="button" class="btn btn-secondary" onclick="toggleAdviceEdit('edit-advice-<?php echo $adv['adviceid']; ?>')">Cancel</button>
+                            </div>
+                        </form>
+                    </div>
+                <?php endif; ?>
+
                 <div class="comments-section" id="comments-<?php echo $adv['adviceid']; ?>">
+                    <div class="comments-list">
                     <?php foreach ($comments as $c): ?>
+                        <?php $cAvatar = !empty($c['userimage']) ? htmlspecialchars($c['userimage'], ENT_QUOTES) : '../media/default-user.png'; ?>
                         <div class="comment-item">
                             <div class="comment-header">
+                                <img src="<?php echo $cAvatar; ?>" alt="" class="comment-avatar">
                                 <strong><?php echo htmlspecialchars($c['name'] . ' ' . $c['surname']); ?></strong>
-                                <span><?php echo (new DateTime($c['commentdate']))->format('d M, H:i'); ?></span>
+                                <span>@<?php echo htmlspecialchars($c['username'], ENT_QUOTES); ?> · <?php echo (new DateTime($c['commentdate']))->format('d M, H:i'); ?></span>
                             </div>
                             <p class="comment-text"><?php echo htmlspecialchars($c['text']); ?></p>
                         </div>
                     <?php endforeach; ?>
+                    </div>
                     
                     <form method="post" class="comment-form">
                         <input type="hidden" name="action" value="comment">
                         <input type="hidden" name="adviceid" value="<?php echo $adv['adviceid']; ?>">
-                        <input type="text" name="text" placeholder="Write a comment..." required>
+                        <input type="text" name="text" placeholder="Write a comment..." class="comment-input" required>
                         <button type="submit" class="btn">Send</button>
                     </form>
                 </div>
-            </div>
+            </article>
         <?php endforeach; ?>
     <?php endif; ?>
 </div>
@@ -218,9 +313,16 @@ function toggleAdminForm() {
     const btn  = document.getElementById('admin-toggle-btn');
     const open = form.style.display === 'block';
     form.style.display = open ? 'none' : 'block';
-    btn.textContent    = open ? '+ New Advice' : '✕ Close';
+    btn.textContent    = open ? '+ New Advice' : 'Close';
+}
+
+function toggleAdviceEdit(id) {
+    const panel = document.getElementById(id);
+    if (!panel) return;
+    panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
 }
 </script>
 
 </body>
 </html>
+

@@ -156,19 +156,32 @@ $sports = $pdo->query("SELECT sportid, name FROM Sport ORDER BY name")->fetchAll
     <link rel="stylesheet" href="../css/header-footer.css">
     <style>
         .form-container {
-            width: min(860px, calc(100% - 2rem));
+            width: min(1040px, calc(100% - 2rem));
             margin: 6rem auto 4rem;
-            background: rgba(9, 18, 28, 0.85);
-            padding: 2.5rem 3rem;
+            background:
+                linear-gradient(145deg, rgba(15,31,45,0.94), rgba(8,14,24,0.9)),
+                rgba(9, 18, 28, 0.88);
+            padding: 1.35rem;
             border-radius: 18px;
-            border: 1px solid rgba(255,255,255,0.1);
-            box-shadow: 0 18px 60px rgba(0,0,0,0.5);
-            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255,255,255,0.12);
+            box-shadow: 0 18px 50px rgba(0,0,0,0.28);
+            backdrop-filter: blur(16px);
+            position: relative;
+            overflow: hidden;
+        }
+        .form-container::before {
+            content: "";
+            position: absolute;
+            inset: 0 0 auto;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(0,238,255,0.45), transparent);
+            pointer-events: none;
         }
         .form-container h2 {
-            margin: 0 0 2rem;
-            font-size: 1.5rem;
-            font-weight: 700;
+            margin: 0 0 1.25rem;
+            font-size: clamp(1.7rem, 2.6vw, 2.35rem);
+            line-height: 1.05;
+            font-weight: 800;
         }
         .form-group {
             margin-bottom: 1.4rem;
@@ -177,7 +190,7 @@ $sports = $pdo->query("SELECT sportid, name FROM Sport ORDER BY name")->fetchAll
             display: block;
             margin-bottom: 0.45rem;
             font-size: 0.9rem;
-            font-weight: 600;
+            font-weight: 750;
             color: rgba(255,255,255,0.75);
         }
         .form-group input,
@@ -185,10 +198,10 @@ $sports = $pdo->query("SELECT sportid, name FROM Sport ORDER BY name")->fetchAll
         .form-group textarea {
             box-sizing: border-box;
             width: 100%;
-            padding: 0.7rem 0.9rem;
-            background: rgba(255,255,255,0.06);
-            border: 1px solid rgba(255,255,255,0.18);
-            border-radius: 10px;
+            padding: 0.72rem 0.85rem;
+            background: rgba(255,255,255,0.055);
+            border: 1px solid rgba(255,255,255,0.16);
+            border-radius: 12px;
             color: #fff;
             font-size: 0.95rem;
             font-family: inherit;
@@ -215,9 +228,9 @@ $sports = $pdo->query("SELECT sportid, name FROM Sport ORDER BY name")->fetchAll
         }
         .sport-specific-fields {
             display: none;
-            padding: 1.2rem 1.4rem;
-            background: rgba(0,0,0,0.25);
-            border-radius: 12px;
+            padding: 1rem;
+            background: rgba(255,255,255,0.045);
+            border-radius: 16px;
             margin-bottom: 1.4rem;
             border: 1px solid rgba(255,255,255,0.08);
         }
@@ -234,8 +247,33 @@ $sports = $pdo->query("SELECT sportid, name FROM Sport ORDER BY name")->fetchAll
             grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
             gap: 1rem;
         }
+        .activity-form-panel {
+            padding: 1rem;
+            background: rgba(255,255,255,0.045);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 16px;
+            margin-bottom: 1rem;
+        }
+        .photo-preview-grid {
+            display:grid;
+            grid-template-columns:repeat(auto-fill,minmax(120px,1fr));
+            gap:0.65rem;
+            margin-top:0.85rem;
+        }
+        .photo-preview-thumb {
+            border-radius:12px;
+            overflow:hidden;
+            aspect-ratio:4/3;
+            border:1px solid rgba(255,255,255,0.1);
+        }
+        .photo-preview-thumb img {
+            width:100%;
+            height:100%;
+            object-fit:cover;
+            display:block;
+        }
         @media (max-width: 600px) {
-            .form-container { padding: 1.5rem 1.2rem; }
+            .form-container { padding: 1rem; margin-top: 5.2rem; }
             .form-two-col, .form-three-col { grid-template-columns: 1fr; }
             .sport-fields-grid { grid-template-columns: 1fr; }
         }
@@ -255,6 +293,7 @@ $sports = $pdo->query("SELECT sportid, name FROM Sport ORDER BY name")->fetchAll
     <?php endif; ?>
 
     <form method="post" action="newactivity.php" enctype="multipart/form-data">
+        <div class="activity-form-panel">
         <div class="form-two-col">
             <div class="form-group">
                 <label for="name">Activity Title *</label>
@@ -282,6 +321,7 @@ $sports = $pdo->query("SELECT sportid, name FROM Sport ORDER BY name")->fetchAll
                 <label for="duration">Duration (minutes) *</label>
                 <input type="number" id="duration" name="duration" required min="1" placeholder="e.g. 45">
             </div>
+        </div>
         </div>
 
         <!-- Sport Specific Fields -->
@@ -358,11 +398,11 @@ $sports = $pdo->query("SELECT sportid, name FROM Sport ORDER BY name")->fetchAll
 
         <hr style="border:none;border-top:1px solid rgba(255,255,255,0.08);margin:1.5rem 0;">
         <p style="font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:#00eeff;margin:0 0 0.9rem;">Photos (optional)</p>
-        <label style="display:block;border:2px dashed rgba(255,255,255,0.2);border-radius:12px;padding:1.5rem;text-align:center;cursor:pointer;transition:border-color 150ms,background 150ms;color:rgba(255,255,255,0.5);font-size:0.9rem;" id="photo-upload-zone">
+        <label class="photo-upload-zone" id="photo-upload-zone">
             <input type="file" name="photos[]" id="photo-input" accept="image/*" multiple style="display:none;">
             <span id="photo-upload-label">Click to add photos (JPG, PNG, WEBP - max 8 MB each)</span>
         </label>
-        <div id="photo-preview" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:0.5rem;margin-top:0.75rem;"></div>
+        <div id="photo-preview" class="photo-preview-grid"></div>
 
         <button type="submit" class="btn" style="width:100%;margin-top:1.5rem;padding:0.8rem;">Save Activity</button>
     </form>
@@ -380,10 +420,9 @@ $sports = $pdo->query("SELECT sportid, name FROM Sport ORDER BY name")->fetchAll
             const reader = new FileReader();
             reader.onload = e => {
                 const div = document.createElement('div');
-                div.style.cssText = 'border-radius:8px;overflow:hidden;aspect-ratio:4/3;';
+                div.className = 'photo-preview-thumb';
                 const img = document.createElement('img');
                 img.src = e.target.result;
-                img.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block;';
                 div.appendChild(img);
                 photoPreview.appendChild(div);
             };

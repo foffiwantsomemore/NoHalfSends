@@ -193,28 +193,37 @@ $v = function($key) use ($sub) { return subVal($sub, $key); };
     <link rel="stylesheet" href="../css/header-footer.css">
     <style>
         .form-container {
-            width: min(860px, calc(100% - 2rem));
+            width: min(1040px, calc(100% - 2rem));
             margin: 6rem auto 4rem;
-            background: rgba(9,18,28,0.88);
-            padding: 2.5rem 3rem;
+            background:
+                linear-gradient(145deg, rgba(15,31,45,0.94), rgba(8,14,24,0.9)),
+                rgba(9,18,28,0.88);
+            padding: 1.35rem;
             border-radius: 18px;
-            border: 1px solid rgba(255,255,255,0.1);
-            box-shadow: 0 18px 60px rgba(0,0,0,0.5);
-            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255,255,255,0.12);
+            box-shadow: 0 18px 50px rgba(0,0,0,0.28);
+            backdrop-filter: blur(16px);
+            position: relative;
+            overflow: hidden;
         }
-        .form-container h2 { margin: 0 0 0.5rem; font-size: 1.5rem; font-weight: 700; }
-        .form-subtitle { font-size: 0.9rem; color: rgba(255,255,255,0.5); margin: 0 0 2rem; }
+        .form-container::before {
+            content: ""; position: absolute; inset: 0 0 auto; height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(0,238,255,0.45), transparent);
+            pointer-events: none;
+        }
+        .form-container h2 { margin: 0 0 0.35rem; font-size: clamp(1.7rem, 2.6vw, 2.35rem); line-height: 1.05; font-weight: 800; }
+        .form-subtitle { font-size: 0.92rem; color: rgba(255,255,255,0.58); margin: 0 0 1.35rem; }
         .form-section-label {
             font-size: 0.75rem; font-weight: 700; text-transform: uppercase;
             letter-spacing: 0.07em; color: #00eeff; margin: 0 0 0.9rem;
         }
-        .form-divider { border: none; border-top: 1px solid rgba(255,255,255,0.08); margin: 1.5rem 0; }
+        .form-divider { border: none; border-top: 1px solid rgba(255,255,255,0.08); margin: 1.2rem 0; }
         .form-group { margin-bottom: 1.2rem; }
-        .form-group label { display: block; margin-bottom: 0.4rem; font-size: 0.87rem; font-weight: 600; color: rgba(255,255,255,0.7); }
+        .form-group label { display: block; margin-bottom: 0.4rem; font-size: 0.87rem; font-weight: 750; color: rgba(255,255,255,0.76); }
         .form-group input, .form-group select, .form-group textarea {
-            box-sizing: border-box; width: 100%; padding: 0.65rem 0.9rem;
-            background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.16);
-            border-radius: 10px; color: #fff; font-size: 0.93rem; font-family: inherit;
+            box-sizing: border-box; width: 100%; padding: 0.72rem 0.85rem;
+            background: rgba(255,255,255,0.055); border: 1px solid rgba(255,255,255,0.16);
+            border-radius: 12px; color: #fff; font-size: 0.93rem; font-family: inherit;
             outline: none; transition: border-color 150ms, background 150ms, box-shadow 150ms;
         }
         .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
@@ -228,17 +237,21 @@ $v = function($key) use ($sub) { return subVal($sub, $key); };
         .form-row-3 { grid-template-columns: 1fr 1fr 1fr; }
         .sport-fields-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(190px,1fr)); gap: 1rem; }
         .sport-specific-box {
-            padding: 1.2rem 1.4rem; background: rgba(0,0,0,0.2);
-            border-radius: 12px; border: 1px solid rgba(255,255,255,0.08); margin-bottom: 1.2rem;
+            padding: 1rem; background: rgba(255,255,255,0.045);
+            border-radius: 16px; border: 1px solid rgba(255,255,255,0.08); margin-bottom: 1rem;
+        }
+        .edit-form-panel {
+            padding: 1rem; background: rgba(255,255,255,0.045);
+            border-radius: 16px; border: 1px solid rgba(255,255,255,0.08); margin-bottom: 1rem;
         }
 
         /* Photo gallery */
-        .photos-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(160px,1fr)); gap: 0.6rem; margin-bottom: 1rem; }
-        .photo-thumb { position: relative; border-radius: 10px; overflow: hidden; aspect-ratio: 4/3; }
+        .photos-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(170px,1fr)); gap: 0.75rem; margin-bottom: 1rem; }
+        .photo-thumb { position: relative; border-radius: 14px; overflow: hidden; aspect-ratio: 4/3; border: 1px solid rgba(255,255,255,0.1); }
         .photo-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
         .photo-delete-btn {
             position: absolute; top: 6px; right: 6px;
-            background: rgba(0,0,0,0.75); border: none; color: #fff;
+            background: rgba(3,8,15,0.82); border: 1px solid rgba(255,255,255,0.14); color: #fff;
             width: 26px; height: 26px; border-radius: 50%; cursor: pointer;
             font-size: 0.85rem; display: flex; align-items: center; justify-content: center;
             transition: background 150ms;
@@ -250,7 +263,9 @@ $v = function($key) use ($sub) { return subVal($sub, $key); };
             border: 2px dashed rgba(255,255,255,0.2); border-radius: 12px;
             padding: 1.5rem; text-align: center; cursor: pointer;
             transition: border-color 150ms, background 150ms;
-            color: rgba(255,255,255,0.5); font-size: 0.9rem;
+            color: rgba(255,255,255,0.62); font-size: 0.9rem;
+            background: rgba(255,255,255,0.035);
+            display: block;
         }
         .upload-zone:hover { border-color: #00eeff; background: rgba(0,238,255,0.04); color: #fff; }
         .upload-zone input { display: none; }
@@ -261,7 +276,7 @@ $v = function($key) use ($sub) { return subVal($sub, $key); };
         .btn-danger:hover { background: rgba(220,50,50,0.3); box-shadow: 0 0 16px rgba(220,50,50,0.4); }
 
         @media (max-width: 600px) {
-            .form-container { padding: 1.5rem 1.1rem; }
+            .form-container { padding: 1rem; margin-top: 5.2rem; }
             .form-row-2, .form-row-3 { grid-template-columns: 1fr; }
             .sport-fields-grid { grid-template-columns: 1fr 1fr; }
         }
