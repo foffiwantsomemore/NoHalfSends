@@ -1,5 +1,7 @@
 # NHS - No Half Sends
 
+Languages: [English](README.md) | [Italiano](README.it.md)
+
 No Half Sends is a sports-oriented social network where registered users can publish activities, follow other athletes, join sport-specific clubs, and read advice about training, nutrition, and recovery.
 
 The name comes from the idea of never doing things halfway.
