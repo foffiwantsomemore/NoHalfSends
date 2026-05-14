@@ -97,20 +97,17 @@ if (!$user) {
                 <form action="uploadProfileImage.php" method="post" enctype="multipart/form-data" class="profile-image-form">
                     <label for="userimage">Cambia immagine profilo:</label>
                     <input type="file" name="userimage" id="userimage" accept="image/*" required>
+                    <div class="profile-image-buttons-wrapper">
+                        <button type="submit" class="btn">Carica</button>
+                    </div>
                 </form>
 
-                <div class="profile-image-buttons-wrapper">
-                    <form action="uploadProfileImage.php" method="post" enctype="multipart/form-data">
-                        <button type="submit" class="btn">Carica</button>
+                <?php if (!empty($user['userimage'])): ?>
+                    <form action="uploadProfileImage.php" method="post" class="profile-image-form">
+                        <input type="hidden" name="remove_profile" value="1">
+                        <button type="submit" class="btn">Rimuovi immagine profilo</button>
                     </form>
-
-                    <?php if (!empty($user['userimage'])): ?>
-                        <form action="uploadProfileImage.php" method="post">
-                            <input type="hidden" name="remove_profile" value="1">
-                            <button type="submit" class="btn">Rimuovi immagine profilo</button>
-                        </form>
-                    <?php endif; ?>
-                </div>
+                <?php endif; ?>
             </div>
 
             </div>
