@@ -1,9 +1,4 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-require_once __DIR__ . '/../include/dbHandler.php';
-
 $userId = isset($_SESSION['userId']) ? (int) $_SESSION['userId'] : 0;
 if ($userId <= 0) {
     header('Location: ../include/loginForm.php');

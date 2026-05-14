@@ -1,6 +1,4 @@
 <?php
-require_once __DIR__ . '/../include/header.php';
-
 $pdo = DBHandler::getPDO();
 
 $userId = $_SESSION['userId'] ?? null;

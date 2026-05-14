@@ -23,12 +23,14 @@
         "dashboard.php",
         "newactivity.php",
         "editactivity.php",
+        "activityAction.php",
         "viewusers.php",
         "uploadProfileImage.php",
         "clubs.php",
         "clubEdit.php",
         "uploadClubImage.php",
-        "advice.php"
+        "advice.php",
+        "logout.php"
     ],
     "DBPages": [
         "feed.php",
@@ -39,6 +41,7 @@
         "dashboard.php",
         "newactivity.php",
         "editactivity.php",
+        "activityAction.php",
         "viewusers.php",
         "register.php",
         "uploadProfileImage.php",

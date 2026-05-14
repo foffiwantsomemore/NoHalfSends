@@ -1,7 +1,4 @@
 <?php
-session_start();
-require_once __DIR__ . '/../include/dbHandler.php';
-
 header('Content-Type: application/json');
 
 // Check if user is authenticated

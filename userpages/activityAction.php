@@ -1,6 +1,4 @@
 <?php
-require_once __DIR__ . '/../include/header.php';
-
 $userId = isset($_SESSION['userId']) ? (int)$_SESSION['userId'] : 0;
 if ($userId <= 0) {
     http_response_code(403);
