@@ -1,6 +1,7 @@
 <?php
 session_start();
 
+// Validate email format and require a non-empty password before querying.
 $email = filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL);
 $insertedPassword = isset($_POST['password']) ? $_POST['password'] : '';
 
@@ -14,13 +15,12 @@ $sth = DBHandler::getPDO()->prepare($sql);
 $sth->bindParam(':email', $email, PDO::PARAM_STR);
 $sth->execute();
 
-//email not found
+// Unknown email sends the user to registration.
 if ($sth->rowCount() === 0) {
     header('Location: registerForm.php');
     exit();
 }
 
-//email found
 $row = $sth->fetch();
 $hashedPassword = $row['password'];
 
@@ -30,6 +30,6 @@ if (password_verify($insertedPassword, $hashedPassword)) {
     exit();
 }
 
-//wrong pw
+// Wrong password returns to the login form
 header('Location: loginForm.php');
 exit();

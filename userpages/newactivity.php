@@ -1,13 +1,10 @@
 <?php
 $userId = isset($_SESSION['userId']) ? (int) $_SESSION['userId'] : 0;
-if ($userId <= 0) {
-    header('Location: ../include/loginForm.php');
-    exit;
-}
 
 $pdo = DBHandler::getPDO();
 $flashMessage = '';
 
+// Create the base activity and its sport-specific row in one transaction.
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $sportId = (int)$_POST['sport_id'];
     $name = trim($_POST['name']);
@@ -28,6 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             try {
                 $pdo->beginTransaction();
 
+                // Insert the common data
                 $sqlAct = "INSERT INTO Activity (userid, sportid, name, activitydate, duration, avgheartrate, maxheartrate, calories, description) 
                            VALUES (:uid, :sid, :name, :date, :dur, :ahr, :mhr, :cal, :desc)";
                 $stmt = $pdo->prepare($sqlAct);
@@ -45,6 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 $activityId = $pdo->lastInsertId();
 
+                // Insert metrics that only exist for the selected sport
                 if ($sportName === 'Run') {
                     $dist = !empty($_POST['distance']) ? (float)$_POST['distance'] : null;
                     $pace = !empty($_POST['pace']) ? (float)$_POST['pace'] : null;
@@ -86,7 +85,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $stmt->execute([$activityId, $dist, $type, $pace]);
                 }
 
-        // Upload photos after activity is created
+                // Upload photos after activity is created
                 $uploadDir = __DIR__ . '/../images/activities/';
                 $uploadError = '';
                 if (!is_dir($uploadDir)) {
@@ -152,140 +151,14 @@ $sports = $pdo->query("SELECT sportid, name FROM Sport ORDER BY name")->fetchAll
     <title>New Activity - NHS</title>
     <link rel="stylesheet" href="../css/global.css?v=3">
     <link rel="stylesheet" href="../css/header-footer.css">
-    <style>
-        .form-container {
-            width: min(1040px, calc(100% - 2rem));
-            margin: 6rem auto 4rem;
-            background:
-                linear-gradient(145deg, rgba(15,31,45,0.94), rgba(8,14,24,0.9)),
-                rgba(9, 18, 28, 0.88);
-            padding: 1.35rem;
-            border-radius: 18px;
-            border: 1px solid rgba(255,255,255,0.12);
-            box-shadow: 0 18px 50px rgba(0,0,0,0.28);
-            backdrop-filter: blur(16px);
-            position: relative;
-            overflow: hidden;
-        }
-        .form-container::before {
-            content: "";
-            position: absolute;
-            inset: 0 0 auto;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(0,238,255,0.45), transparent);
-            pointer-events: none;
-        }
-        .form-container h2 {
-            margin: 0 0 1.25rem;
-            font-size: clamp(1.7rem, 2.6vw, 2.35rem);
-            line-height: 1.05;
-            font-weight: 800;
-        }
-        .form-group {
-            margin-bottom: 1.4rem;
-        }
-        .form-group label {
-            display: block;
-            margin-bottom: 0.45rem;
-            font-size: 0.9rem;
-            font-weight: 750;
-            color: rgba(255,255,255,0.75);
-        }
-        .form-group input,
-        .form-group select,
-        .form-group textarea {
-            box-sizing: border-box;
-            width: 100%;
-            padding: 0.72rem 0.85rem;
-            background: rgba(255,255,255,0.055);
-            border: 1px solid rgba(255,255,255,0.16);
-            border-radius: 12px;
-            color: #fff;
-            font-size: 0.95rem;
-            font-family: inherit;
-            outline: none;
-            transition: border-color 150ms ease, background 150ms ease, box-shadow 150ms ease;
-        }
-        .form-group input:focus,
-        .form-group select:focus,
-        .form-group textarea:focus {
-            border-color: rgba(0,238,255,0.5);
-            background: rgba(255,255,255,0.1);
-            box-shadow: 0 0 0 3px rgba(0,238,255,0.08);
-        }
-        .form-group select option { background: #09121c; }
-        .form-two-col {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1.2rem;
-        }
-        .form-three-col {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 1.2rem;
-        }
-        .sport-specific-fields {
-            display: none;
-            padding: 1rem;
-            background: rgba(255,255,255,0.045);
-            border-radius: 16px;
-            margin-bottom: 1.4rem;
-            border: 1px solid rgba(255,255,255,0.08);
-        }
-        .sport-fields-title {
-            font-size: 0.8rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.06em;
-            color: #00eeff;
-            margin: 0 0 1rem;
-        }
-        .sport-fields-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 1rem;
-        }
-        .activity-form-panel {
-            padding: 1rem;
-            background: rgba(255,255,255,0.045);
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 16px;
-            margin-bottom: 1rem;
-        }
-        .photo-preview-grid {
-            display:grid;
-            grid-template-columns:repeat(auto-fill,minmax(120px,1fr));
-            gap:0.65rem;
-            margin-top:0.85rem;
-        }
-        .photo-preview-thumb {
-            border-radius:12px;
-            overflow:hidden;
-            aspect-ratio:4/3;
-            border:1px solid rgba(255,255,255,0.1);
-        }
-        .photo-preview-thumb img {
-            width:100%;
-            height:100%;
-            object-fit:cover;
-            display:block;
-        }
-        @media (max-width: 600px) {
-            .form-container { padding: 1rem; margin-top: 5.2rem; }
-            .form-two-col, .form-three-col { grid-template-columns: 1fr; }
-            .sport-fields-grid { grid-template-columns: 1fr; }
-        }
-    </style>
 </head>
 <body>
-
-<?php include __DIR__ . '/../include/menu/menuChoice.php'; ?>
 
 <div class="form-container">
     <h2>Log a New Activity</h2>
     
     <?php if ($flashMessage): ?>
-        <div style="color: #ff6b6b; margin-bottom: 1.5rem; padding: 0.9rem 1rem; background: rgba(255, 107, 107, 0.1); border-radius: 10px; border: 1px solid rgba(255,107,107,0.3);">
+        <div class="form-error-message">
             <?php echo htmlspecialchars($flashMessage); ?>
         </div>
     <?php endif; ?>
@@ -326,43 +199,43 @@ $sports = $pdo->query("SELECT sportid, name FROM Sport ORDER BY name")->fetchAll
         <div id="sport-fields-container" class="sport-specific-fields">
             <p class="sport-fields-title" id="sport-fields-label">Sport details</p>
             <div class="sport-fields-grid">
-                <div class="sport-field form-group" id="f-distance" style="display:none;">
+                <div class="sport-field form-group" id="f-distance">
                     <label>Distance (km)</label>
                     <input type="number" step="0.01" name="distance" placeholder="0.00">
                 </div>
-                <div class="sport-field form-group" id="f-elevation" style="display:none;">
+                <div class="sport-field form-group" id="f-elevation">
                     <label>Elevation Gain (m)</label>
                     <input type="number" name="elevation" placeholder="0">
                 </div>
-                <div class="sport-field form-group" id="f-pace" style="display:none;">
+                <div class="sport-field form-group" id="f-pace">
                     <label>Pace (min/km)</label>
                     <input type="number" step="0.01" name="pace" placeholder="0.00">
                 </div>
-                <div class="sport-field form-group" id="f-cadence" style="display:none;">
+                <div class="sport-field form-group" id="f-cadence">
                     <label>Cadence (rpm/spm)</label>
                     <input type="number" name="cadence" placeholder="0">
                 </div>
-                <div class="sport-field form-group" id="f-avgspeed" style="display:none;">
+                <div class="sport-field form-group" id="f-avgspeed">
                     <label>Avg Speed (km/h)</label>
                     <input type="number" step="0.01" name="avgspeed" placeholder="0.00">
                 </div>
-                <div class="sport-field form-group" id="f-maxspeed" style="display:none;">
+                <div class="sport-field form-group" id="f-maxspeed">
                     <label>Max Speed (km/h)</label>
                     <input type="number" step="0.01" name="maxspeed" placeholder="0.00">
                 </div>
-                <div class="sport-field form-group" id="f-avgpower" style="display:none;">
+                <div class="sport-field form-group" id="f-avgpower">
                     <label>Avg Power (W)</label>
                     <input type="number" name="avgpower" placeholder="0">
                 </div>
-                <div class="sport-field form-group" id="f-maxpower" style="display:none;">
+                <div class="sport-field form-group" id="f-maxpower">
                     <label>Max Power (W)</label>
                     <input type="number" name="maxpower" placeholder="0">
                 </div>
-                <div class="sport-field form-group" id="f-type" style="display:none;">
+                <div class="sport-field form-group" id="f-type">
                     <label>Type / Style</label>
                     <input type="text" name="type" placeholder="Freestyle, Legs…">
                 </div>
-                <div class="sport-field form-group" id="f-cycling-type" style="display:none;">
+                <div class="sport-field form-group" id="f-cycling-type">
                     <label>Bike Type</label>
                     <select name="cycling_type">
                         <option value="">Select…</option>
@@ -394,62 +267,25 @@ $sports = $pdo->query("SELECT sportid, name FROM Sport ORDER BY name")->fetchAll
             </div>
         </div>
 
-        <hr style="border:none;border-top:1px solid rgba(255,255,255,0.08);margin:1.5rem 0;">
-        <p style="font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:#00eeff;margin:0 0 0.9rem;">Photos (optional)</p>
+        <hr class="form-divider">
+        <p class="form-section-label">Photos (optional)</p>
         <label class="photo-upload-zone" id="photo-upload-zone">
-            <input type="file" name="photos[]" id="photo-input" accept="image/*" multiple style="display:none;">
+            <input type="file" name="photos[]" id="photo-input" accept="image/*" multiple>
             <span id="photo-upload-label">Click to add photos (JPG, PNG, WEBP - max 8 MB each)</span>
         </label>
-        <div id="photo-preview" class="photo-preview-grid"></div>
 
-        <button type="submit" class="btn" style="width:100%;margin-top:1.5rem;padding:0.8rem;">Save Activity</button>
+        <button type="submit" class="btn new-activity-submit">Save Activity</button>
     </form>
 </div>
 
 <script>
-    // Photo preview
-    const photoInput = document.getElementById('photo-input');
-    const photoPreview = document.getElementById('photo-preview');
-    const uploadZone = document.getElementById('photo-upload-zone');
-
-    photoInput.addEventListener('change', () => {
-        photoPreview.innerHTML = '';
-        Array.from(photoInput.files).forEach(file => {
-            const reader = new FileReader();
-            reader.onload = e => {
-                const div = document.createElement('div');
-                div.className = 'photo-preview-thumb';
-                const img = document.createElement('img');
-                img.src = e.target.result;
-                div.appendChild(img);
-                photoPreview.appendChild(div);
-            };
-            reader.readAsDataURL(file);
-        });
-        document.getElementById('photo-upload-label').textContent =
-            photoInput.files.length === 1
-                ? photoInput.files[0].name
-                : photoInput.files.length + ' photos selected';
-    });
-
-    uploadZone.addEventListener('dragover', e => { e.preventDefault(); uploadZone.style.borderColor='#00eeff'; });
-    uploadZone.addEventListener('dragleave', () => { uploadZone.style.borderColor=''; });
-    uploadZone.addEventListener('drop', e => {
-        e.preventDefault();
-        uploadZone.style.borderColor='';
-        const dt = new DataTransfer();
-        Array.from(e.dataTransfer.files).forEach(f => dt.items.add(f));
-        photoInput.files = dt.files;
-        photoInput.dispatchEvent(new Event('change'));
-    });
-
-    // Sport fields toggle
+    // Show only the fields that match the selected sport.
     function showSportFields() {
         const select = document.getElementById('sport_id');
         const sportName = select.options[select.selectedIndex].getAttribute('data-name');
         const container = document.getElementById('sport-fields-container');
 
-        // Hide and reset ALL sport-specific fields (safe for both input and select)
+        // Hide and reset ALL sport-specific fields
         document.querySelectorAll('.sport-field').forEach(el => {
             el.style.display = 'none';
             el.querySelectorAll('input, select, textarea').forEach(inp => {

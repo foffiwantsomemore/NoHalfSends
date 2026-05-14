@@ -7,7 +7,7 @@ if ($userId <= 0) {
 
 $pdo = DBHandler::getPDO();
 
-// Handle Follow / Unfollow
+// Follow/unfollow
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     if ($_POST['action'] === 'follow' && isset($_POST['target_id'])) {
         $targetId = (int)$_POST['target_id'];
@@ -23,7 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     exit;
 }
 
-// Feed activities
+// Main feed query
 $sqlFeed = "
     SELECT
         a.activityid, a.userid,
@@ -66,7 +66,7 @@ $sthFeed = $pdo->prepare($sqlFeed);
 $sthFeed->execute([':userId' => $userId, ':userId2' => $userId, ':userIdLike' => $userId]);
 $feedActivities = $sthFeed->fetchAll();
 
-// Collect photos and comments for all activities
+// Collect photos and comments
 $activityIds = array_column($feedActivities, 'activityid');
 $photosByActivity = [];
 $commentsByActivity = [];
@@ -93,7 +93,7 @@ if (!empty($activityIds)) {
     }
 }
 
-// Recommended users
+// Suggested users
 $sqlRecommended = "
     SELECT u.userid, u.username, u.name, u.surname, u.userimage,
            (SELECT COUNT(*) FROM Follow WHERE followedid = u.userid) AS followers
@@ -106,6 +106,7 @@ $sthRec = $pdo->prepare($sqlRecommended);
 $sthRec->execute([':userId' => $userId, ':userId2' => $userId]);
 $recommendedUsers = $sthRec->fetchAll();
 
+// Display durations
 $formatDuration = function($minutes) {
     $h = intdiv($minutes, 60); $m = $minutes % 60;
     return $h > 0 ? "{$h}h {$m}m" : "{$m}m";
@@ -121,8 +122,6 @@ $formatDuration = function($minutes) {
     <link rel="stylesheet" href="../css/header-footer.css">
 </head>
 <body>
-
-<?php include __DIR__ . '/../include/menu/menuChoice.php'; ?>
 
 <div class="feed-container">
     <main class="feed-main">
@@ -147,6 +146,7 @@ $formatDuration = function($minutes) {
                 $activityStats = [];
                 $activityStats[] = ['label' => 'Duration', 'value' => $formatDuration((int)$act['duration'])];
 
+                // Add only metrics that exist for the current sport/activity.
                 $addStat = function($label, $value) use (&$activityStats) {
                     if ($value !== null && $value !== '') {
                         $activityStats[] = ['label' => $label, 'value' => $value];

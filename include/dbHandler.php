@@ -3,7 +3,7 @@
 class DBHandler {
     private static $pdo; // pointer to the PDO object
 
-    // constructor is unusable
+    // Static-only class: prevent creating DBHandler objects.
     private function __construct() {
     }
 
@@ -18,7 +18,6 @@ class DBHandler {
         define('USER', 'root');
         define('PASSWORD', '');
 
-        // Database connection
         try {
             $connection_string = 'mysql:host=localhost;dbname=nhs;charset=utf8';
             $connection_array = array(

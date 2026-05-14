@@ -13,8 +13,6 @@
 
 <body>
 
-    <?php include __DIR__ . '/../include/menu/homeMenu.php'; ?>
-
     <div class="home-center">
         <div class="acronym-content">
             <h1>About NHS</h1>
@@ -25,7 +23,6 @@
             <p>Join us and become part of a movement where half measures simply don't exist.</p>
         </div>
     </div>
-
 
 </body>
 

@@ -3,6 +3,7 @@ $pdo = DBHandler::getPDO();
 
 $userId = $_SESSION['userId'] ?? null;
 
+// Removing the profile image clears the database path and deletes the stored file.
 if (isset($_POST['remove_profile'])) {
     $sqlOld = "SELECT userimage FROM User WHERE userid = :uid";
     $sthOld = $pdo->prepare($sqlOld);
@@ -28,6 +29,7 @@ if (isset($_POST['remove_profile'])) {
     exit;
 }
 
+// A normal upload must provide one valid image file.
 if (!isset($_FILES['userimage']) || $_FILES['userimage']['error'] !== UPLOAD_ERR_OK) {
     header('Location: profile.php');
     exit;
@@ -49,6 +51,7 @@ if ($file['size'] > 5 * 1024 * 1024) { //5MB
 $ext = pathinfo($file['name'], PATHINFO_EXTENSION);
 $ext = strtolower($ext);
 
+// Keep the old path so it can be deleted after the new file is saved.
 $sqlOld = "SELECT userimage FROM User WHERE userid = :uid";
 $sthOld = $pdo->prepare($sqlOld);
 $sthOld->bindValue(':uid', $userId, PDO::PARAM_INT);
@@ -61,6 +64,7 @@ if (!is_dir($uploadDir)) {
     mkdir($uploadDir, 0777, true);
 }
 
+// Filename includes the user id and timestamp to avoid overwriting previous uploads.
 $filename = 'user_' . $userId . '_' . time() . '.' . $ext;
 $destPath = $uploadDir . $filename;
 
@@ -77,6 +81,7 @@ $sth->bindValue(':img', $relativePath, PDO::PARAM_STR);
 $sth->bindValue(':uid', $userId, PDO::PARAM_INT);
 $sth->execute();
 
+// Remove the previous image after the database has been updated successfully.
 if (!empty($oldImage)) {
     $basenameOld = basename($oldImage);
     $oldAbsPath = __DIR__ . '/../images/users/' . $basenameOld;

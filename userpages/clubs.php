@@ -1,11 +1,8 @@
 <?php
 $userId = isset($_SESSION['userId']) ? (int) $_SESSION['userId'] : 0;
-if ($userId <= 0) {
-    header('Location: ../include/loginForm.php');
-    exit;
-}
 
 $pdo = DBHandler::getPDO();
+
 $flashMessage = $_SESSION['clubs_flash'] ?? null;
 unset($_SESSION['clubs_flash']);
 
@@ -30,6 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 throw new RuntimeException('Lo sport selezionato non esiste.');
             }
 
+            // Create the club and creator membership together to avoid orphan clubs.
             $pdo->beginTransaction();
 
             $insertClub = $pdo->prepare(
@@ -75,6 +73,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 throw new RuntimeException('Il club selezionato non esiste.');
             }
 
+            // Prevent duplicate memberships before inserting into the join table.
             $checkMembership = $pdo->prepare('SELECT COUNT(*) FROM UserClub WHERE userid = :uid AND clubid = :cid');
             $checkMembership->bindValue(':uid', $userId, PDO::PARAM_INT);
             $checkMembership->bindValue(':cid', $clubId, PDO::PARAM_INT);
@@ -122,6 +121,7 @@ $sportFilter = (int) ($_GET['sport'] ?? 0);
 $sportsStmt = $pdo->query('SELECT sportid, name FROM Sport ORDER BY name');
 $sports = $sportsStmt ? $sportsStmt->fetchAll() : [];
 
+// v_club_detail already includes sport data, counts, last activity, and creator info.
 $baseSql = "
     SELECT
         cd.clubid,
@@ -145,6 +145,7 @@ $baseSql = "
 $conditions = [];
 $params = [':uid' => $userId];
 
+// Optional search and sport filters are appended dynamically but still bound safely.
 if ($searchTerm !== '') {
     $conditions[] = '(cd.name LIKE :search_term OR cd.description LIKE :search_term OR cd.sport_name LIKE :search_term)';
     $params[':search_term'] = '%' . $searchTerm . '%';
@@ -176,6 +177,7 @@ $clubIds = array_map(static function (array $club): int {
     return (int) $club['clubid'];
 }, $clubs);
 
+// Load recent activity for all visible clubs in one query, then keep only three per club.
 $recentActivitiesByClub = [];
 if (!empty($clubIds)) {
     $placeholders = implode(',', array_fill(0, count($clubIds), '?'));
@@ -213,6 +215,7 @@ if (!empty($clubIds)) {
     }
 }
 
+// Split the same club result set into page sections.
 $createdClubs = array_values(array_filter($clubs, static function (array $club): bool {
     return (int) $club['is_admin'] === 1;
 }));
@@ -228,6 +231,7 @@ $totalMembersAcrossFilteredClubs = array_reduce($clubs, static function (int $ca
     return $carry + (int) $club['member_count'];
 }, 0);
 
+// Keep date rendering resilient when aggregate dates are missing.
 $formatDateTime = static function (?string $value): string {
     if (empty($value)) {
         return 'N/A';
@@ -252,11 +256,9 @@ $formatDateTime = static function (?string $value): string {
     <link rel="stylesheet" href="../css/clubs.css">
     <link rel="stylesheet" href="../css/header-footer.css">
 
-
 </head>
 
 <body class="clubs-page">
-    <?php include __DIR__ . '/../include/menu/menuChoice.php'; ?>
 
     <main class="clubs-shell">
         <section class="clubs-hero">

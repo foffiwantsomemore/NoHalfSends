@@ -1,12 +1,11 @@
 <?php
 $userId = isset($_SESSION['userId']) ? (int)$_SESSION['userId'] : 0;
-if ($userId <= 0) { header('Location: ../include/loginForm.php'); exit; }
 
 $pdo = DBHandler::getPDO();
 $activityId = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 if ($activityId <= 0) { header('Location: feed.php'); exit; }
 
-// Load activity + verify ownership
+// Load activity and verify ownership in the same query.
 $sth = $pdo->prepare("
     SELECT a.*, s.name AS sport_name
     FROM Activity a
@@ -17,7 +16,7 @@ $sth->execute([':aid' => $activityId, ':uid' => $userId]);
 $act = $sth->fetch();
 if (!$act) { header('Location: feed.php'); exit; }
 
-// Load sport-specific data
+// Map sport names to their specialization tables.
 $sportName = $act['sport_name'];
 $sub = [];
 $sportTableMap = [
@@ -35,17 +34,14 @@ if ($subTable) {
     $sub = $sth2->fetch() ?: [];
 }
 
-// Load photos
 $stmtP = $pdo->prepare("SELECT activityphotoid, url FROM ActivityPhoto WHERE activityid = ?");
 $stmtP->execute([$activityId]);
 $photos = $stmtP->fetchAll();
 
-// All sports for select
 $sports = $pdo->query("SELECT sportid, name FROM Sport ORDER BY name")->fetchAll();
 
 $flashMessage = '';
 
-// Handle POST
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_POST['form_action'] ?? 'update';
 
@@ -97,7 +93,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    // Main update
+    // Main update for activity fields and sport-specific metrics.
     $name        = trim($_POST['name'] ?? '');
     $date        = $_POST['activitydate'] ?? '';
     $duration    = (int)($_POST['duration'] ?? 0);
@@ -117,7 +113,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                            ':ahr'=>$avgHR,':mhr'=>$maxHR,':cal'=>$calories,
                            ':desc'=>$description,':aid'=>$activityId]);
 
-            // Update sport sub-table (DELETE + INSERT for simplicity)
             if ($subTable) {
                 $pdo->prepare("DELETE FROM `$subTable` WHERE activityid=?")->execute([$activityId]);
                 if ($sportName === 'Run') {
@@ -171,7 +166,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $flashMessage = 'Please fill out all required fields.';
     }
 
-    // Reload updated data after failed save
     $sth->execute([':aid' => $activityId, ':uid' => $userId]);
     $act = $sth->fetch();
 }
@@ -180,6 +174,7 @@ function subVal($sub, $key) {
     return htmlspecialchars(isset($sub[$key]) ? $sub[$key] : '', ENT_QUOTES);
 }
 $v = function($key) use ($sub) { return subVal($sub, $key); };
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -189,96 +184,6 @@ $v = function($key) use ($sub) { return subVal($sub, $key); };
     <title>Edit Activity - NHS</title>
     <link rel="stylesheet" href="../css/global.css?v=3">
     <link rel="stylesheet" href="../css/header-footer.css">
-    <style>
-        .form-container {
-            width: min(1040px, calc(100% - 2rem));
-            margin: 6rem auto 4rem;
-            background:
-                linear-gradient(145deg, rgba(15,31,45,0.94), rgba(8,14,24,0.9)),
-                rgba(9,18,28,0.88);
-            padding: 1.35rem;
-            border-radius: 18px;
-            border: 1px solid rgba(255,255,255,0.12);
-            box-shadow: 0 18px 50px rgba(0,0,0,0.28);
-            backdrop-filter: blur(16px);
-            position: relative;
-            overflow: hidden;
-        }
-        .form-container::before {
-            content: ""; position: absolute; inset: 0 0 auto; height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(0,238,255,0.45), transparent);
-            pointer-events: none;
-        }
-        .form-container h2 { margin: 0 0 0.35rem; font-size: clamp(1.7rem, 2.6vw, 2.35rem); line-height: 1.05; font-weight: 800; }
-        .form-subtitle { font-size: 0.92rem; color: rgba(255,255,255,0.58); margin: 0 0 1.35rem; }
-        .form-section-label {
-            font-size: 0.75rem; font-weight: 700; text-transform: uppercase;
-            letter-spacing: 0.07em; color: #00eeff; margin: 0 0 0.9rem;
-        }
-        .form-divider { border: none; border-top: 1px solid rgba(255,255,255,0.08); margin: 1.2rem 0; }
-        .form-group { margin-bottom: 1.2rem; }
-        .form-group label { display: block; margin-bottom: 0.4rem; font-size: 0.87rem; font-weight: 750; color: rgba(255,255,255,0.76); }
-        .form-group input, .form-group select, .form-group textarea {
-            box-sizing: border-box; width: 100%; padding: 0.72rem 0.85rem;
-            background: rgba(255,255,255,0.055); border: 1px solid rgba(255,255,255,0.16);
-            border-radius: 12px; color: #fff; font-size: 0.93rem; font-family: inherit;
-            outline: none; transition: border-color 150ms, background 150ms, box-shadow 150ms;
-        }
-        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
-            border-color: rgba(0,238,255,0.5); background: rgba(255,255,255,0.1);
-            box-shadow: 0 0 0 3px rgba(0,238,255,0.08);
-        }
-        .form-group select option { background: #09121c; }
-        .form-group textarea { resize: vertical; min-height: 90px; line-height: 1.5; }
-        .form-row { display: grid; gap: 1.1rem; }
-        .form-row-2 { grid-template-columns: 1fr 1fr; }
-        .form-row-3 { grid-template-columns: 1fr 1fr 1fr; }
-        .sport-fields-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(190px,1fr)); gap: 1rem; }
-        .sport-specific-box {
-            padding: 1rem; background: rgba(255,255,255,0.045);
-            border-radius: 16px; border: 1px solid rgba(255,255,255,0.08); margin-bottom: 1rem;
-        }
-        .edit-form-panel {
-            padding: 1rem; background: rgba(255,255,255,0.045);
-            border-radius: 16px; border: 1px solid rgba(255,255,255,0.08); margin-bottom: 1rem;
-        }
-
-        /* Photo gallery */
-        .photos-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(170px,1fr)); gap: 0.75rem; margin-bottom: 1rem; }
-        .photo-thumb { position: relative; border-radius: 14px; overflow: hidden; aspect-ratio: 4/3; border: 1px solid rgba(255,255,255,0.1); }
-        .photo-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
-        .photo-delete-btn {
-            position: absolute; top: 6px; right: 6px;
-            background: rgba(3,8,15,0.82); border: 1px solid rgba(255,255,255,0.14); color: #fff;
-            width: 26px; height: 26px; border-radius: 50%; cursor: pointer;
-            font-size: 0.85rem; display: flex; align-items: center; justify-content: center;
-            transition: background 150ms;
-        }
-        .photo-delete-btn:hover { background: rgba(220,50,50,0.9); }
-
-        /* Upload drop zone */
-        .upload-zone {
-            border: 2px dashed rgba(255,255,255,0.2); border-radius: 12px;
-            padding: 1.5rem; text-align: center; cursor: pointer;
-            transition: border-color 150ms, background 150ms;
-            color: rgba(255,255,255,0.62); font-size: 0.9rem;
-            background: rgba(255,255,255,0.035);
-            display: block;
-        }
-        .upload-zone:hover { border-color: #00eeff; background: rgba(0,238,255,0.04); color: #fff; }
-        .upload-zone input { display: none; }
-
-        /* Action buttons */
-        .form-actions { display: flex; gap: 0.75rem; margin-top: 1.5rem; }
-        .btn-danger { background: rgba(220,50,50,0.15); border-color: rgba(220,50,50,0.4); color: #ff6b6b; }
-        .btn-danger:hover { background: rgba(220,50,50,0.3); box-shadow: 0 0 16px rgba(220,50,50,0.4); }
-
-        @media (max-width: 600px) {
-            .form-container { padding: 1rem; margin-top: 5.2rem; }
-            .form-row-2, .form-row-3 { grid-template-columns: 1fr; }
-            .sport-fields-grid { grid-template-columns: 1fr 1fr; }
-        }
-    </style>
 </head>
 <body>
 <?php include __DIR__ . '/../include/menu/menuChoice.php'; ?>
@@ -288,7 +193,7 @@ $v = function($key) use ($sub) { return subVal($sub, $key); };
     <p class="form-subtitle"><?= htmlspecialchars($act['sport_name']) ?> · <?= (new DateTime($act['activitydate']))->format('d M Y') ?></p>
 
     <?php if ($flashMessage): ?>
-        <div style="color:#ff6b6b;margin-bottom:1.5rem;padding:0.9rem 1rem;background:rgba(255,107,107,0.1);border-radius:10px;border:1px solid rgba(255,107,107,0.3);">
+        <div class="form-error-message">
             <?= htmlspecialchars($flashMessage) ?>
         </div>
     <?php endif; ?>
@@ -305,7 +210,7 @@ $v = function($key) use ($sub) { return subVal($sub, $key); };
             </div>
             <div class="form-group">
                 <label>Sport</label>
-                <input type="text" value="<?= htmlspecialchars($act['sport_name']) ?>" disabled style="opacity:0.6;">
+                <input class="input-muted" type="text" value="<?= htmlspecialchars($act['sport_name']) ?>" disabled>
             </div>
         </div>
         <div class="form-row form-row-2">
@@ -410,7 +315,7 @@ $v = function($key) use ($sub) { return subVal($sub, $key); };
         </div>
 
         <div class="form-actions">
-            <button type="submit" class="btn" style="flex:1;">Save Changes</button>
+            <button type="submit" class="btn form-primary-action">Save Changes</button>
             <a href="feed.php" class="btn btn-secondary">Cancel</a>
         </div>
     </form>
@@ -441,8 +346,8 @@ $v = function($key) use ($sub) { return subVal($sub, $key); };
             <input type="file" name="photo" accept="image/*" id="photo-input">
             <span id="upload-label">Click to add a photo (JPG, PNG, WEBP - max 8 MB)</span>
         </label>
-        <div style="margin-top:0.75rem; display:flex; justify-content:flex-end;">
-            <button type="submit" class="btn" id="upload-submit-btn" style="display:none;">Upload</button>
+        <div class="upload-actions">
+            <button type="submit" class="btn upload-submit-btn" id="upload-submit-btn">Upload</button>
         </div>
     </form>
 </div>

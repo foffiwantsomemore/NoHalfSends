@@ -13,12 +13,9 @@
 
 <body>
 
-  <?php include __DIR__ . '/../include/menu/homeMenu.php'; ?>
-
   <div class="home-center">
     <h1>Welcome to NHS</h1>
   </div>
-
 
 </body>
 

@@ -1,9 +1,5 @@
 <?php
 $userId = isset($_SESSION['userId']) ? (int) $_SESSION['userId'] : 0;
-if ($userId <= 0) {
-    header('Location: ../include/loginForm.php');
-    exit;
-}
 
 $pdo = DBHandler::getPDO();
 
@@ -22,6 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $content = trim($_POST['content']);
             $category = $_POST['category'];
 
+            // Create the advice first so the optional photo can reference the new advice id.
             if (!empty($title) && !empty($content)) {
                 $stmt = $pdo->prepare("INSERT INTO Advice (authorid, title, content, createdate, category) VALUES (?, ?, ?, NOW(), ?)");
                 $stmt->execute([$userId, $title, $content, $category]);
@@ -48,8 +45,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             header('Location: advice.php');
             exit;
+
+            // Update advice
         } elseif ($action === 'update_advice' && $isAdmin) {
-            $adviceId = (int)($_POST['adviceid'] ?? 0);
+            $adviceId = (int) ($_POST['adviceid'] ?? 0);
             $title = trim($_POST['title'] ?? '');
             $content = trim($_POST['content'] ?? '');
             $category = $_POST['category'] ?? '';
@@ -59,6 +58,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $stmt = $pdo->prepare("UPDATE Advice SET title = ?, content = ?, category = ? WHERE adviceid = ?");
                 $stmt->execute([$title, $content, $category, $adviceId]);
 
+                // Replacement photo
                 if (isset($_FILES['photo']) && $_FILES['photo']['error'] === UPLOAD_ERR_OK) {
                     $file = $_FILES['photo'];
                     $allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
@@ -82,7 +82,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     unlink($oldPath);
                                 }
                                 $stmt = $pdo->prepare("UPDATE AdvicePhoto SET url = ? WHERE advicephotoid = ?");
-                                $stmt->execute([$relativePath, (int)$existingPhoto['advicephotoid']]);
+                                $stmt->execute([$relativePath, (int) $existingPhoto['advicephotoid']]);
                             } else {
                                 $stmt = $pdo->prepare("INSERT INTO AdvicePhoto (adviceid, url) VALUES (?, ?)");
                                 $stmt->execute([$adviceId, $relativePath]);
@@ -94,7 +94,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             header('Location: advice.php');
             exit;
         } elseif ($action === 'like') {
-            $adviceId = (int)$_POST['adviceid'];
+            $adviceId = (int) $_POST['adviceid'];
+            // Toggle like
             $stmt = $pdo->prepare("SELECT 1 FROM AdviceLike WHERE userid = ? AND adviceid = ?");
             $stmt->execute([$userId, $adviceId]);
             if ($stmt->fetchColumn()) {
@@ -107,7 +108,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             header('Location: advice.php');
             exit;
         } elseif ($action === 'comment') {
-            $adviceId = (int)$_POST['adviceid'];
+            $adviceId = (int) $_POST['adviceid'];
             $text = trim($_POST['text']);
             if (!empty($text)) {
                 $stmt = $pdo->prepare("INSERT INTO AdviceComment (userid, adviceid, text, commentdate) VALUES (?, ?, ?, NOW())");
@@ -119,7 +120,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Fetch advices
+// Fetch advice cards
 $stmt = $pdo->query("
     SELECT a.*, u.name as author_name, u.surname as author_surname, u.userimage as author_image,
            (SELECT COUNT(*) FROM AdviceLike WHERE adviceid = a.adviceid) as like_count,
@@ -131,9 +132,11 @@ $stmt = $pdo->query("
     ORDER BY a.createdate DESC
 ");
 $advices = $stmt->fetchAll();
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -141,183 +144,191 @@ $advices = $stmt->fetchAll();
     <link rel="stylesheet" href="../css/global.css?v=2">
     <link rel="stylesheet" href="../css/header-footer.css">
 </head>
+
 <body>
 
-<?php include __DIR__ . '/../include/header.php'; ?>
-
-<div class="advice-container">
-    <div class="advice-page-header">
-        <div>
-            <span class="advice-eyebrow">Coach notes</span>
-            <h2>Advice &amp; News</h2>
+    <div class="advice-container">
+        <div class="advice-page-header">
+            <div>
+                <span class="advice-eyebrow">Coach notes</span>
+                <h2>Advice &amp; News</h2>
+            </div>
+            <?php if ($isAdmin): ?>
+                <button class="btn" onclick="toggleAdminForm()" id="admin-toggle-btn">+ New Advice</button>
+            <?php endif; ?>
         </div>
+
         <?php if ($isAdmin): ?>
-            <button class="btn" onclick="toggleAdminForm()" id="admin-toggle-btn">+ New Advice</button>
+            <div class="admin-form-container" id="admin-form" style="display:none;">
+                <h3 class="admin-form-title">Publish New Advice</h3>
+                <form method="post" enctype="multipart/form-data" class="advice-admin-form">
+                    <input type="hidden" name="action" value="publish">
+                    <label>Title</label>
+                    <input type="text" name="title" required placeholder="Advice title...">
+                    <label>Category</label>
+                    <select name="category" required>
+                        <option value="nutrition">Nutrition</option>
+                        <option value="training">Training</option>
+                        <option value="recovery">Recovery</option>
+                    </select>
+                    <label>Content</label>
+                    <textarea name="content" rows="5" required placeholder="Write your advice..."></textarea>
+                    <label>Photo (optional)</label>
+                    <input type="file" name="photo" accept="image/*">
+                    <button type="submit" class="btn" style="width:100%; margin-top:0.5rem;">Publish</button>
+                </form>
+            </div>
         <?php endif; ?>
-    </div>
 
-    <?php if ($isAdmin): ?>
-        <div class="admin-form-container" id="admin-form" style="display:none;">
-            <h3 class="admin-form-title">Publish New Advice</h3>
-            <form method="post" enctype="multipart/form-data" class="advice-admin-form">
-                <input type="hidden" name="action" value="publish">
-                <label>Title</label>
-                <input type="text" name="title" required placeholder="Advice title...">
-                <label>Category</label>
-                <select name="category" required>
-                    <option value="nutrition">Nutrition</option>
-                    <option value="training">Training</option>
-                    <option value="recovery">Recovery</option>
-                </select>
-                <label>Content</label>
-                <textarea name="content" rows="5" required placeholder="Write your advice..."></textarea>
-                <label>Photo (optional)</label>
-                <input type="file" name="photo" accept="image/*">
-                <button type="submit" class="btn" style="width:100%; margin-top:0.5rem;">Publish</button>
-            </form>
-        </div>
-    <?php endif; ?>
-
-    <?php if (empty($advices)): ?>
-        <p class="advice-empty">No advice or news published yet.</p>
-    <?php else: ?>
-        <?php foreach ($advices as $adv): ?>
-            <article class="advice-card">
-                <div class="advice-header">
-                    <?php $uImg = !empty($adv['author_image']) ? htmlspecialchars($adv['author_image']) : '../media/default-user.png'; ?>
-                    <img src="<?php echo $uImg; ?>" class="advice-author-img" alt="Author">
-                    <div class="advice-meta">
-                        <h4><?php echo htmlspecialchars($adv['author_name'] . ' ' . $adv['author_surname']); ?></h4>
-                        <span><?php echo (new DateTime($adv['createdate']))->format('d M Y, H:i'); ?></span>
-                    </div>
-                    <div class="advice-category"><?php echo htmlspecialchars($adv['category']); ?></div>
-                </div>
-
-                <div class="advice-card-main <?= !empty($adv['photo_url']) ? 'has-photo' : 'no-photo' ?>">
-                    <div class="advice-copy">
-                        <h3 class="advice-title"><?php echo htmlspecialchars($adv['title']); ?></h3>
-                        
-                        <div class="advice-content">
-                            <?php echo nl2br(htmlspecialchars($adv['content'])); ?>
+        <?php if (empty($advices)): ?>
+            <p class="advice-empty">No advice or news published yet.</p>
+        <?php else: ?>
+            <?php foreach ($advices as $adv): ?>
+                <article class="advice-card">
+                    <div class="advice-header">
+                        <?php $uImg = !empty($adv['author_image']) ? htmlspecialchars($adv['author_image']) : '../media/default-user.png'; ?>
+                        <img src="<?php echo $uImg; ?>" class="advice-author-img" alt="Author">
+                        <div class="advice-meta">
+                            <h4><?php echo htmlspecialchars($adv['author_name'] . ' ' . $adv['author_surname']); ?></h4>
+                            <span><?php echo (new DateTime($adv['createdate']))->format('d M Y, H:i'); ?></span>
                         </div>
+                        <div class="advice-category"><?php echo htmlspecialchars($adv['category']); ?></div>
                     </div>
 
-                    <?php if (!empty($adv['photo_url'])): ?>
-                        <img src="<?php echo htmlspecialchars($adv['photo_url']); ?>" class="advice-photo" alt="Advice Photo">
-                    <?php endif; ?>
-                </div>
+                    <div class="advice-card-main <?= !empty($adv['photo_url']) ? 'has-photo' : 'no-photo' ?>">
+                        <div class="advice-copy">
+                            <h3 class="advice-title"><?php echo htmlspecialchars($adv['title']); ?></h3>
 
-                <div class="advice-actions">
-                    <form method="post">
-                        <input type="hidden" name="action" value="like">
-                        <input type="hidden" name="adviceid" value="<?php echo $adv['adviceid']; ?>">
-                        <button type="submit" class="action-btn <?php echo $adv['is_liked'] ? 'liked' : ''; ?>">
-                            <span class="advice-action-icon" aria-hidden="true">&hearts;</span>
-                            <?php echo $adv['like_count']; ?> Likes
-                        </button>
-                    </form>
-                    
-                    <?php
+                            <div class="advice-content">
+                                <?php echo nl2br(htmlspecialchars($adv['content'])); ?>
+                            </div>
+                        </div>
+
+                        <?php if (!empty($adv['photo_url'])): ?>
+                            <img src="<?php echo htmlspecialchars($adv['photo_url']); ?>" class="advice-photo" alt="Advice Photo">
+                        <?php endif; ?>
+                    </div>
+
+                    <div class="advice-actions">
+                        <form method="post">
+                            <input type="hidden" name="action" value="like">
+                            <input type="hidden" name="adviceid" value="<?php echo $adv['adviceid']; ?>">
+                            <button type="submit" class="action-btn <?php echo $adv['is_liked'] ? 'liked' : ''; ?>">
+                                <span class="advice-action-icon" aria-hidden="true">&hearts;</span>
+                                <?php echo $adv['like_count']; ?> Likes
+                            </button>
+                        </form>
+
+                        <?php
                         $stmt = $pdo->prepare("SELECT c.*, u.name, u.surname, u.username, u.userimage FROM AdviceComment c JOIN User u ON c.userid = u.userid WHERE c.adviceid = ? ORDER BY c.commentdate ASC");
                         $stmt->execute([$adv['adviceid']]);
                         $comments = $stmt->fetchAll();
-                    ?>
-                    
-                    <button type="button" class="action-btn" onclick="toggleComments('comments-<?php echo $adv['adviceid']; ?>')">
-                        <span class="advice-action-icon advice-comment-icon" aria-hidden="true"></span>
-                        <?php echo count($comments); ?> Comments
-                    </button>
+                        ?>
+
+                        <button type="button" class="action-btn"
+                            onclick="toggleComments('comments-<?php echo $adv['adviceid']; ?>')">
+                            <span class="advice-action-icon advice-comment-icon" aria-hidden="true"></span>
+                            <?php echo count($comments); ?> Comments
+                        </button>
+
+                        <?php if ($isAdmin): ?>
+                            <button type="button" class="action-btn advice-edit-toggle"
+                                onclick="toggleAdviceEdit('edit-advice-<?php echo $adv['adviceid']; ?>')">
+                                Edit
+                            </button>
+                        <?php endif; ?>
+                    </div>
 
                     <?php if ($isAdmin): ?>
-                        <button type="button" class="action-btn advice-edit-toggle" onclick="toggleAdviceEdit('edit-advice-<?php echo $adv['adviceid']; ?>')">
-                            Edit
-                        </button>
+                        <div class="advice-edit-panel" id="edit-advice-<?php echo $adv['adviceid']; ?>">
+                            <h4>Edit advice</h4>
+                            <form method="post" enctype="multipart/form-data" class="advice-admin-form advice-inline-edit-form">
+                                <input type="hidden" name="action" value="update_advice">
+                                <input type="hidden" name="adviceid" value="<?php echo (int) $adv['adviceid']; ?>">
+
+                                <label>Title</label>
+                                <input type="text" name="title" required
+                                    value="<?php echo htmlspecialchars($adv['title'], ENT_QUOTES); ?>">
+
+                                <label>Category</label>
+                                <select name="category" required>
+                                    <option value="nutrition" <?php echo $adv['category'] === 'nutrition' ? 'selected' : ''; ?>>
+                                        Nutrition</option>
+                                    <option value="training" <?php echo $adv['category'] === 'training' ? 'selected' : ''; ?>>Training
+                                    </option>
+                                    <option value="recovery" <?php echo $adv['category'] === 'recovery' ? 'selected' : ''; ?>>Recovery
+                                    </option>
+                                </select>
+
+                                <label>Content</label>
+                                <textarea name="content" rows="5"
+                                    required><?php echo htmlspecialchars($adv['content'], ENT_QUOTES); ?></textarea>
+
+                                <label>Replace photo (optional)</label>
+                                <input type="file" name="photo" accept="image/*">
+
+                                <div class="advice-edit-actions">
+                                    <button type="submit" class="btn">Save changes</button>
+                                    <button type="button" class="btn btn-secondary"
+                                        onclick="toggleAdviceEdit('edit-advice-<?php echo $adv['adviceid']; ?>')">Cancel</button>
+                                </div>
+                            </form>
+                        </div>
                     <?php endif; ?>
-                </div>
 
-                <?php if ($isAdmin): ?>
-                    <div class="advice-edit-panel" id="edit-advice-<?php echo $adv['adviceid']; ?>">
-                        <h4>Edit advice</h4>
-                        <form method="post" enctype="multipart/form-data" class="advice-admin-form advice-inline-edit-form">
-                            <input type="hidden" name="action" value="update_advice">
-                            <input type="hidden" name="adviceid" value="<?php echo (int)$adv['adviceid']; ?>">
+                    <div class="comments-section" id="comments-<?php echo $adv['adviceid']; ?>">
+                        <div class="comments-list">
+                            <?php foreach ($comments as $c): ?>
+                                <?php $cAvatar = !empty($c['userimage']) ? htmlspecialchars($c['userimage'], ENT_QUOTES) : '../media/default-user.png'; ?>
+                                <div class="comment-item">
+                                    <div class="comment-header">
+                                        <img src="<?php echo $cAvatar; ?>" alt="" class="comment-avatar">
+                                        <strong><?php echo htmlspecialchars($c['name'] . ' ' . $c['surname']); ?></strong>
+                                        <span>@<?php echo htmlspecialchars($c['username'], ENT_QUOTES); ?> ·
+                                            <?php echo (new DateTime($c['commentdate']))->format('d M, H:i'); ?></span>
+                                    </div>
+                                    <p class="comment-text"><?php echo htmlspecialchars($c['text']); ?></p>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
 
-                            <label>Title</label>
-                            <input type="text" name="title" required value="<?php echo htmlspecialchars($adv['title'], ENT_QUOTES); ?>">
-
-                            <label>Category</label>
-                            <select name="category" required>
-                                <option value="nutrition" <?php echo $adv['category'] === 'nutrition' ? 'selected' : ''; ?>>Nutrition</option>
-                                <option value="training" <?php echo $adv['category'] === 'training' ? 'selected' : ''; ?>>Training</option>
-                                <option value="recovery" <?php echo $adv['category'] === 'recovery' ? 'selected' : ''; ?>>Recovery</option>
-                            </select>
-
-                            <label>Content</label>
-                            <textarea name="content" rows="5" required><?php echo htmlspecialchars($adv['content'], ENT_QUOTES); ?></textarea>
-
-                            <label>Replace photo (optional)</label>
-                            <input type="file" name="photo" accept="image/*">
-
-                            <div class="advice-edit-actions">
-                                <button type="submit" class="btn">Save changes</button>
-                                <button type="button" class="btn btn-secondary" onclick="toggleAdviceEdit('edit-advice-<?php echo $adv['adviceid']; ?>')">Cancel</button>
-                            </div>
+                        <form method="post" class="comment-form">
+                            <input type="hidden" name="action" value="comment">
+                            <input type="hidden" name="adviceid" value="<?php echo $adv['adviceid']; ?>">
+                            <input type="text" name="text" placeholder="Write a comment..." class="comment-input" required>
+                            <button type="submit" class="btn">Send</button>
                         </form>
                     </div>
-                <?php endif; ?>
+                </article>
+            <?php endforeach; ?>
+        <?php endif; ?>
+    </div>
 
-                <div class="comments-section" id="comments-<?php echo $adv['adviceid']; ?>">
-                    <div class="comments-list">
-                    <?php foreach ($comments as $c): ?>
-                        <?php $cAvatar = !empty($c['userimage']) ? htmlspecialchars($c['userimage'], ENT_QUOTES) : '../media/default-user.png'; ?>
-                        <div class="comment-item">
-                            <div class="comment-header">
-                                <img src="<?php echo $cAvatar; ?>" alt="" class="comment-avatar">
-                                <strong><?php echo htmlspecialchars($c['name'] . ' ' . $c['surname']); ?></strong>
-                                <span>@<?php echo htmlspecialchars($c['username'], ENT_QUOTES); ?> · <?php echo (new DateTime($c['commentdate']))->format('d M, H:i'); ?></span>
-                            </div>
-                            <p class="comment-text"><?php echo htmlspecialchars($c['text']); ?></p>
-                        </div>
-                    <?php endforeach; ?>
-                    </div>
-                    
-                    <form method="post" class="comment-form">
-                        <input type="hidden" name="action" value="comment">
-                        <input type="hidden" name="adviceid" value="<?php echo $adv['adviceid']; ?>">
-                        <input type="text" name="text" placeholder="Write a comment..." class="comment-input" required>
-                        <button type="submit" class="btn">Send</button>
-                    </form>
-                </div>
-            </article>
-        <?php endforeach; ?>
-    <?php endif; ?>
-</div>
+    <script>
+        function toggleComments(id) {
+            const el = document.getElementById(id);
+            if (el.style.display === 'block') {
+                el.style.display = 'none';
+            } else {
+                el.style.display = 'block';
+            }
+        }
 
-<script>
-function toggleComments(id) {
-    const el = document.getElementById(id);
-    if (el.style.display === 'block') {
-        el.style.display = 'none';
-    } else {
-        el.style.display = 'block';
-    }
-}
+        function toggleAdminForm() {
+            const form = document.getElementById('admin-form');
+            const btn = document.getElementById('admin-toggle-btn');
+            const open = form.style.display === 'block';
+            form.style.display = open ? 'none' : 'block';
+            btn.textContent = open ? '+ New Advice' : 'Close';
+        }
 
-function toggleAdminForm() {
-    const form = document.getElementById('admin-form');
-    const btn  = document.getElementById('admin-toggle-btn');
-    const open = form.style.display === 'block';
-    form.style.display = open ? 'none' : 'block';
-    btn.textContent    = open ? '+ New Advice' : 'Close';
-}
-
-function toggleAdviceEdit(id) {
-    const panel = document.getElementById(id);
-    if (!panel) return;
-    panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
-}
-</script>
+        function toggleAdviceEdit(id) {
+            const panel = document.getElementById(id);
+            if (!panel) return;
+            panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
+        }
+    </script>
 
 </body>
-</html>
 
+</html>

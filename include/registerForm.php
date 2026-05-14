@@ -13,8 +13,6 @@
 
 <body>
 
-    <?php include __DIR__ . '/menu/homeMenu.php'; ?>
-
     <form action="register.php" method="post">
         <label for="name">Name:</label>
         <input type="text" id="name" name="name" required><br><br>
@@ -32,7 +30,6 @@
 
         <a href="loginForm.php">Do you already have an account? Login.</a>
     </form>
-
 
 </body>
 

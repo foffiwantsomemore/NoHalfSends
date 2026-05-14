@@ -13,7 +13,7 @@
         "advice.php"
     ],
     "adminpages": [
-        "privileges.php"
+        
     ],
     "loggedInPages": [
         "profile.php",

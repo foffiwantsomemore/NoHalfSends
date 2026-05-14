@@ -1,5 +1,5 @@
 <?php
-$userId = isset($_SESSION['userId']) ? (int)$_SESSION['userId'] : 0;
+$userId = isset($_SESSION['userId']) ? (int) $_SESSION['userId'] : 0;
 if ($userId <= 0) {
     http_response_code(403);
     exit('Unauthorized');
@@ -10,8 +10,9 @@ $action = $_POST['action'] ?? '';
 
 // --- LIKE / UNLIKE ---
 if ($action === 'like' || $action === 'unlike') {
-    $activityId = (int)($_POST['activity_id'] ?? 0);
-    if ($activityId <= 0) exit('Invalid');
+    $activityId = (int) ($_POST['activity_id'] ?? 0);
+    if ($activityId <= 0)
+        exit('Invalid');
 
     if ($action === 'like') {
         $stmt = $pdo->prepare('INSERT IGNORE INTO ActivityLike (userid, activityid) VALUES (?, ?)');
@@ -29,9 +30,10 @@ if ($action === 'like' || $action === 'unlike') {
 
 // --- COMMENT ---
 if ($action === 'comment') {
-    $activityId = (int)($_POST['activity_id'] ?? 0);
+    $activityId = (int) ($_POST['activity_id'] ?? 0);
     $text = trim($_POST['text'] ?? '');
-    if ($activityId <= 0 || $text === '') exit('Invalid');
+    if ($activityId <= 0 || $text === '')
+        exit('Invalid');
 
     $stmt = $pdo->prepare('INSERT INTO ActivityComment (userid, activityid, text, commentdate) VALUES (?, ?, ?, NOW())');
     $stmt->execute([$userId, $activityId, $text]);
@@ -60,14 +62,15 @@ HTML;
 
 // --- UPLOAD PHOTO ---
 if ($action === 'upload_photo') {
-    $activityId = (int)($_POST['activity_id'] ?? 0);
-    if ($activityId <= 0) exit('Invalid');
+    $activityId = (int) ($_POST['activity_id'] ?? 0);
+    if ($activityId <= 0)
+        exit('Invalid');
 
     // Verify user owns activity
     $stmt = $pdo->prepare('SELECT userid FROM Activity WHERE activityid = ?');
     $stmt->execute([$activityId]);
     $owner = $stmt->fetchColumn();
-    if ((int)$owner !== $userId) {
+    if ((int) $owner !== $userId) {
         http_response_code(403);
         exit('Not your activity');
     }
@@ -83,15 +86,17 @@ if ($action === 'upload_photo') {
         http_response_code(400);
         exit('Invalid type');
     }
-    if ($file['size'] > 8 * 1024 * 1024) {
+    if ($file['size'] > 10 * 1024 * 1024) {
         http_response_code(400);
         exit('File too large');
     }
 
     $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
     $uploadDir = __DIR__ . '/../images/activities/';
-    if (!is_dir($uploadDir)) mkdir($uploadDir, 0777, true);
+    if (!is_dir($uploadDir))
+        mkdir($uploadDir, 0777, true);
 
+    // Add random bytes so repeated uploads in the same second cannot collide.
     $filename = 'act_' . $activityId . '_' . time() . '_' . bin2hex(random_bytes(4)) . '.' . $ext;
     $destPath = $uploadDir . $filename;
 

@@ -14,12 +14,11 @@ if (file_exists($jsonPath)) {
     if (in_array($pageName, $obj->loggedInPages)) {
         require_once __DIR__ . '/../header.php';
     }
-
     if (in_array($pageName, $obj->DBPages)) {
         require_once __DIR__ . '/../dbHandler.php';
     }
 
-    // home-specific navbar (unique bar for home and related pages)
+    // Choose the navbar according to the page category.
     if (property_exists($obj, 'homeOnly') && in_array($pageName, $obj->homeOnly)) {
         include __DIR__ . '/homeMenu.php';
     } else {

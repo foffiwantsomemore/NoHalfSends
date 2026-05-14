@@ -1,10 +1,6 @@
 <?php
 
 $userId = isset($_SESSION['userId']) ? (int) $_SESSION['userId'] : 0;
-if ($userId <= 0) {
-    header('Location: ../include/loginForm.php');
-    exit;
-}
 
 $clubId = (int) ($_GET['id'] ?? 0);
 if ($clubId <= 0) {
@@ -16,7 +12,7 @@ $pdo = DBHandler::getPDO();
 $errorMessage = '';
 $successMessage = '';
 
-// Fetch club details
+// Fetch club details and the current user's membership role in one query.
 $sqlClub = "
     SELECT 
         c.clubid, 
@@ -43,13 +39,12 @@ if (!$club) {
     exit;
 }
 
-// Check if user is admin
+// Only club admins may edit club details or images.
 if ((int) $club['admin'] !== 1) {
     header('Location: clubs.php');
     exit;
 }
 
-// Handle form submissions
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_POST['action'] ?? '';
 
@@ -94,13 +89,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 throw new RuntimeException('File size exceeds 5MB limit.');
             }
 
-            // Validate file type
             $fileInfo = getimagesize($uploadedFile['tmp_name']);
             if ($fileInfo === false) {
                 throw new RuntimeException('Uploaded file is not a valid image.');
             }
 
-            // Get file extension
             $originalExtension = pathinfo($uploadedFile['name'], PATHINFO_EXTENSION);
             $extension = strtolower($originalExtension);
 
@@ -118,7 +111,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 mkdir($uploadDir, 0755, true);
             }
 
-            // Delete old image if exists
+            // Delete old image before storing the new path to avoid unused files.
             if (!empty($club['clubimage'])) {
                 $oldImagePath = __DIR__ . '/../' . $club['clubimage'];
                 if (file_exists($oldImagePath)) {
@@ -183,7 +176,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link rel="stylesheet" href="../css/clubs.css">
 </head>
 <body>
-    <?php include __DIR__ . '/../include/menu/menuChoice.php'; ?>
 
     <div class="club-edit-container">
         <div class="club-edit-header">

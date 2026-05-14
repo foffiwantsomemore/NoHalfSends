@@ -1,5 +1,6 @@
 <link rel="stylesheet" href="../../css/header-footer.css">
 
+<!-- Basic admin navigation used by admin-only pages. -->
 <nav>
     <ul>
         <li><a href="/projects/NoHalfSends/adminpages/viewusers.php">ViewUsers</a></li>

@@ -28,6 +28,7 @@ $isActive = function ($page) use ($currentPage) {
 </div>
 
 <script>
+  // Home pages use a slightly different body/nav treatment in CSS.
   (function () {
     document.documentElement.classList.add('home-page');
     document.body.classList.add('home-page');

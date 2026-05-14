@@ -1,7 +1,6 @@
 <?php
 header('Content-Type: application/json');
 
-// Check if user is authenticated
 $userId = isset($_SESSION['userId']) ? (int) $_SESSION['userId'] : 0;
 if ($userId <= 0) {
     http_response_code(401);
@@ -9,7 +8,6 @@ if ($userId <= 0) {
     exit;
 }
 
-// Get club ID
 $clubId = (int) ($_POST['club_id'] ?? 0);
 if ($clubId <= 0) {
     http_response_code(400);
@@ -34,7 +32,6 @@ if (!$membership || (int) $membership['admin'] !== 1) {
     exit;
 }
 
-// Handle file upload
 if (!isset($_FILES['image']) || $_FILES['image']['error'] === UPLOAD_ERR_NO_FILE) {
     http_response_code(400);
     echo json_encode(['success' => false, 'error' => 'No image file provided']);
@@ -84,18 +81,15 @@ try {
         throw new Exception('Club not found');
     }
 
-    // Generate filename
+    // Generate a deterministic-but-unique filename for the club.
     $timestamp = time();
     $newFilename = "club_" . $clubId . "_" . $timestamp . "." . $extension;
     $uploadDir = __DIR__ . '/../images/clubs/';
     $uploadPath = $uploadDir . $newFilename;
 
-    // Create directory if needed
     if (!is_dir($uploadDir)) {
         mkdir($uploadDir, 0755, true);
     }
-
-    // Delete old image if exists
     if (!empty($club['clubimage'])) {
         $oldImagePath = __DIR__ . '/../' . $club['clubimage'];
         if (file_exists($oldImagePath)) {

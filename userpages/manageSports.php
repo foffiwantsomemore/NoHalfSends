@@ -3,12 +3,7 @@
 $pdo = DBHandler::getPDO();
 
 $userId = $_SESSION['userId'] ?? null;
-if (!$userId) {
-    header('Location: ../include/loginForm.php');
-    exit;
-}
 
-// handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $selected = isset($_POST['sports']) && is_array($_POST['sports'])
         ? array_map('intval', $_POST['sports'])
@@ -16,7 +11,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $pdo->beginTransaction();
     try {
-        // remove all current sports for user
+        // Remove all current sports
         $sqlDel = 'DELETE FROM SportUser WHERE userid = :uid';
         $sthDel = $pdo->prepare($sqlDel);
         $sthDel->bindValue(':uid', $userId, PDO::PARAM_INT);
@@ -39,17 +34,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     } catch (PDOException $e) {
         $pdo->rollBack();
-        // in caso di errore, continuiamo a mostrare la pagina senza redirect
+        // in case of error, we continue to show the page without redirect
     }
 }
 
-// load all sports
+// Load all sports for the checkbox grid.
 $sqlSports = 'SELECT sportid, name, sportimage FROM Sport ORDER BY name';
 $sthSports = $pdo->prepare($sqlSports);
 $sthSports->execute();
 $sports = $sthSports->fetchAll();
 
-// load user's current sports
+// Load current sport ids to pre-check the right boxes.
 $sqlUserSports = 'SELECT sportid FROM SportUser WHERE userid = :uid';
 $sthUserSports = $pdo->prepare($sqlUserSports);
 $sthUserSports->bindValue(':uid', $userId, PDO::PARAM_INT);
@@ -69,8 +64,6 @@ $userSportIds = array_map(function($row) { return (int)$row['sportid']; }, $user
     <link rel="stylesheet" href="../css/header-footer.css">
 </head>
 <body>
-
-<?php include __DIR__ . '/../include/menu/menuChoice.php'; ?>
 
 <div class="profile-page manage-sports-page">
     <section class="profile-section">

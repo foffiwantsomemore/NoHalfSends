@@ -13,15 +13,12 @@
 
 <body>
 
-    <?php include __DIR__ . '/../include/menu/homeMenu.php'; ?>
-
     <div class="home-center acronym-center">
         <div class="acronym-content">
             <h1>NHS</h1>
             <p>The acronym NHS stands for No Half Sends: don't do things halfway.</p>
         </div>
     </div>
-
 
 </body>
 

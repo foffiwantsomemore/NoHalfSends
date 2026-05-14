@@ -3,14 +3,11 @@
 $pdo = DBHandler::getPDO();
 
 $userId = $_SESSION['userId'] ?? null;
-if (!$userId) {
-    header('Location: ../include/loginForm.php');
-    exit;
-}
 
 $errorMessage = '';
 $successMessage = '';
 
+// Update only editable profile fields; image changes are handled by uploadProfileImage.php.
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $name = trim($_POST['name'] ?? '');
     $surname = trim($_POST['surname'] ?? '');
@@ -43,6 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
+// Reload profile data after a save so the form reflects the latest database state.
 $sqlUser = "
     SELECT userid, name, surname, username, description, userimage, email, registrationdate
     FROM v_user_profile
@@ -68,8 +66,6 @@ if (!$user) {
     <link rel="stylesheet" href="../css/header-footer.css">
 </head>
 <body>
-
-<?php include __DIR__ . '/../include/menu/menuChoice.php'; ?>
 
 <div class="profile-page">
     <section class="profile-section profile-edit-shell">
